@@ -1,10 +1,11 @@
 import { NavLink } from "@/components/NavLink";
-import { Home, Search, Users, ClipboardList, MessageSquare } from "lucide-react";
+import { Home, Search, Users, Crown, ClipboardList, MessageSquare } from "lucide-react";
 
 const navItems = [
   { to: "/", label: "Home", icon: Home },
   { to: "/search", label: "Search", icon: Search },
-  { to: "/leaders", label: "Leaders", icon: Users },
+  { to: "/national-leaders", label: "National", icon: Crown },
+  { to: "/leaders", label: "Governors", icon: Users },
   { to: "/surveys", label: "Surveys", icon: ClipboardList },
   { to: "/feedback", label: "Feedback", icon: MessageSquare },
 ];
