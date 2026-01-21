@@ -227,24 +227,69 @@ const Counties = () => {
 };
 
 function LeaderRow({ leader, position, onClose }: { leader: Leader; position?: string; onClose: () => void }) {
+  const initials = leader.name.split(" ").map((n) => n[0]).join("").slice(0, 2);
+  
+  // Generate parliament website search link based on position
+  const getParliamentLink = () => {
+    if (leader.position.includes("Senator")) {
+      return "http://www.parliament.go.ke/the-senate/senators";
+    } else if (leader.position.includes("MP") || leader.position.includes("Women Rep")) {
+      return "http://www.parliament.go.ke/the-national-assembly/members";
+    }
+    return "http://www.parliament.go.ke";
+  };
+
   return (
-    <Link
-      to={`/leader/${leader.id}`}
-      className="flex items-center gap-3 p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors"
-      onClick={onClose}
-    >
-      <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-sm font-semibold text-primary">
-        {leader.name.split(" ").map((n) => n[0]).join("").slice(0, 2)}
+    <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors">
+      {/* Photo with fallback */}
+      <div className="flex flex-col items-center gap-1">
+        <div className="h-12 w-12 rounded-full overflow-hidden bg-primary/10 flex items-center justify-center">
+          {leader.photo_url ? (
+            <img 
+              src={leader.photo_url} 
+              alt={leader.name}
+              className="h-full w-full object-cover"
+              onError={(e) => {
+                const target = e.currentTarget;
+                target.style.display = 'none';
+                target.nextElementSibling?.classList.remove('hidden');
+              }}
+            />
+          ) : null}
+          <span className={`text-sm font-semibold text-primary ${leader.photo_url ? 'hidden' : ''}`}>
+            {initials}
+          </span>
+        </div>
+        <a
+          href={getParliamentLink()}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-[10px] text-primary hover:underline flex items-center gap-0.5"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <ExternalLink className="h-2.5 w-2.5" />
+          Parliament
+        </a>
       </div>
-      <div className="flex-1">
+      
+      {/* Leader info - clickable to profile */}
+      <Link
+        to={`/leader/${leader.id}`}
+        className="flex-1 hover:text-primary transition-colors"
+        onClick={onClose}
+      >
         <p className="font-medium">{leader.name}</p>
         <p className="text-sm text-muted-foreground">{position || leader.position}</p>
-      </div>
+      </Link>
+      
       {leader.party && (
         <Badge variant="outline" className="text-xs">{leader.party}</Badge>
       )}
-      <ChevronRight className="h-4 w-4 text-muted-foreground" />
-    </Link>
+      
+      <Link to={`/leader/${leader.id}`} onClick={onClose}>
+        <ChevronRight className="h-4 w-4 text-muted-foreground hover:text-primary" />
+      </Link>
+    </div>
   );
 }
 
