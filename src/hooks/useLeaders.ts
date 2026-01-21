@@ -89,3 +89,34 @@ export function useSearchLeaders(searchTerm: string) {
     },
   });
 }
+
+// Fisher-Yates shuffle algorithm
+function shuffleArray<T>(array: T[]): T[] {
+  const shuffled = [...array];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+}
+
+export function useRandomLeaders(limit: number = 12) {
+  return useQuery({
+    queryKey: ["leaders", "random", limit],
+    queryFn: async (): Promise<Leader[]> => {
+      const { data, error } = await supabase
+        .from("leaders")
+        .select(`*, counties(*)`);
+
+      if (error) throw error;
+      
+      const leaders = (data || []).map((item) => transformLeader(item as Record<string, unknown>));
+      
+      // Shuffle and return limited results for variety
+      const shuffled = shuffleArray(leaders);
+      return shuffled.slice(0, limit);
+    },
+    staleTime: 0, // Always refetch to get new random order
+    refetchOnWindowFocus: false,
+  });
+}
