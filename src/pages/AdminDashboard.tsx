@@ -1,10 +1,11 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Layout } from "@/components/layout/Layout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Table,
   TableBody,
@@ -19,9 +20,10 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Shield, MessageSquare, MoreHorizontal, Trash2, CheckCircle, Clock, XCircle, LogOut } from "lucide-react";
+import { Shield, MessageSquare, MoreHorizontal, Trash2, CheckCircle, Clock, XCircle, LogOut, Camera } from "lucide-react";
 import { useAuth, useIsAdmin, useSignOut } from "@/hooks/useAuth";
 import { useAdminFeedback, useUpdateFeedbackStatus, useDeleteFeedback } from "@/hooks/useFeedback";
+import { LeaderPhotoManager } from "@/components/admin/LeaderPhotoManager";
 import { toast } from "sonner";
 import { format } from "date-fns";
 
@@ -135,118 +137,138 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        {/* Feedback Table */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <MessageSquare className="h-5 w-5" />
-              Citizen Feedback
-            </CardTitle>
-            <CardDescription>
-              Review and moderate feedback submissions from citizens
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {feedbackLoading ? (
-              <div className="space-y-4">
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <Skeleton key={i} className="h-16 w-full" />
-                ))}
-              </div>
-            ) : feedbackError ? (
-              <div className="text-center py-8 text-muted-foreground">
-                <p>Failed to load feedback. Make sure you have admin access.</p>
-              </div>
-            ) : feedback && feedback.length > 0 ? (
-              <div className="rounded-md border">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Date</TableHead>
-                      <TableHead>Subject</TableHead>
-                      <TableHead>Message</TableHead>
-                      <TableHead>Submitter</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead className="w-[70px]">Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {feedback.map((item) => {
-                      const status = statusConfig[item.status as keyof typeof statusConfig] || statusConfig.pending;
-                      const StatusIcon = status.icon;
-                      
-                      return (
-                        <TableRow key={item.id}>
-                          <TableCell className="whitespace-nowrap">
-                            {format(new Date(item.created_at), "MMM d, yyyy")}
-                          </TableCell>
-                          <TableCell className="font-medium max-w-[200px] truncate">
-                            {item.subject}
-                          </TableCell>
-                          <TableCell className="max-w-[300px]">
-                            <p className="truncate">{item.message}</p>
-                          </TableCell>
-                          <TableCell>
-                            <div className="text-sm">
-                              {item.name && <p>{item.name}</p>}
-                              {item.email && (
-                                <p className="text-muted-foreground text-xs">{item.email}</p>
-                              )}
-                              {!item.name && !item.email && (
-                                <span className="text-muted-foreground italic">Anonymous</span>
-                              )}
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <Badge className={status.className} variant="secondary">
-                              <StatusIcon className="h-3 w-3 mr-1" />
-                              {status.label}
-                            </Badge>
-                          </TableCell>
-                          <TableCell>
-                            <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" size="sm">
-                                  <MoreHorizontal className="h-4 w-4" />
-                                </Button>
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent align="end">
-                                <DropdownMenuItem
-                                  onClick={() => handleStatusChange(item.id, "reviewed")}
-                                >
-                                  <CheckCircle className="h-4 w-4 mr-2 text-green-600" />
-                                  Mark Reviewed
-                                </DropdownMenuItem>
-                                <DropdownMenuItem
-                                  onClick={() => handleStatusChange(item.id, "rejected")}
-                                >
-                                  <XCircle className="h-4 w-4 mr-2 text-red-600" />
-                                  Mark Rejected
-                                </DropdownMenuItem>
-                                <DropdownMenuItem
-                                  onClick={() => handleDelete(item.id)}
-                                  className="text-destructive"
-                                >
-                                  <Trash2 className="h-4 w-4 mr-2" />
-                                  Delete
-                                </DropdownMenuItem>
-                              </DropdownMenuContent>
-                            </DropdownMenu>
-                          </TableCell>
+        {/* Admin Tabs */}
+        <Tabs defaultValue="feedback" className="space-y-4">
+          <TabsList>
+            <TabsTrigger value="feedback" className="flex items-center gap-2">
+              <MessageSquare className="h-4 w-4" />
+              Feedback
+            </TabsTrigger>
+            <TabsTrigger value="photos" className="flex items-center gap-2">
+              <Camera className="h-4 w-4" />
+              Leader Photos
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="feedback">
+            {/* Feedback Table */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <MessageSquare className="h-5 w-5" />
+                  Citizen Feedback
+                </CardTitle>
+                <CardDescription>
+                  Review and moderate feedback submissions from citizens
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {feedbackLoading ? (
+                  <div className="space-y-4">
+                    {Array.from({ length: 5 }).map((_, i) => (
+                      <Skeleton key={i} className="h-16 w-full" />
+                    ))}
+                  </div>
+                ) : feedbackError ? (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <p>Failed to load feedback. Make sure you have admin access.</p>
+                  </div>
+                ) : feedback && feedback.length > 0 ? (
+                  <div className="rounded-md border">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Date</TableHead>
+                          <TableHead>Subject</TableHead>
+                          <TableHead>Message</TableHead>
+                          <TableHead>Submitter</TableHead>
+                          <TableHead>Status</TableHead>
+                          <TableHead className="w-[70px]">Actions</TableHead>
                         </TableRow>
-                      );
-                    })}
-                  </TableBody>
-                </Table>
-              </div>
-            ) : (
-              <div className="text-center py-12">
-                <MessageSquare className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                <p className="text-muted-foreground">No feedback submissions yet</p>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+                      </TableHeader>
+                      <TableBody>
+                        {feedback.map((item) => {
+                          const status = statusConfig[item.status as keyof typeof statusConfig] || statusConfig.pending;
+                          const StatusIcon = status.icon;
+                          
+                          return (
+                            <TableRow key={item.id}>
+                              <TableCell className="whitespace-nowrap">
+                                {format(new Date(item.created_at), "MMM d, yyyy")}
+                              </TableCell>
+                              <TableCell className="font-medium max-w-[200px] truncate">
+                                {item.subject}
+                              </TableCell>
+                              <TableCell className="max-w-[300px]">
+                                <p className="truncate">{item.message}</p>
+                              </TableCell>
+                              <TableCell>
+                                <div className="text-sm">
+                                  {item.name && <p>{item.name}</p>}
+                                  {item.email && (
+                                    <p className="text-muted-foreground text-xs">{item.email}</p>
+                                  )}
+                                  {!item.name && !item.email && (
+                                    <span className="text-muted-foreground italic">Anonymous</span>
+                                  )}
+                                </div>
+                              </TableCell>
+                              <TableCell>
+                                <Badge className={status.className} variant="secondary">
+                                  <StatusIcon className="h-3 w-3 mr-1" />
+                                  {status.label}
+                                </Badge>
+                              </TableCell>
+                              <TableCell>
+                                <DropdownMenu>
+                                  <DropdownMenuTrigger asChild>
+                                    <Button variant="ghost" size="sm">
+                                      <MoreHorizontal className="h-4 w-4" />
+                                    </Button>
+                                  </DropdownMenuTrigger>
+                                  <DropdownMenuContent align="end">
+                                    <DropdownMenuItem
+                                      onClick={() => handleStatusChange(item.id, "reviewed")}
+                                    >
+                                      <CheckCircle className="h-4 w-4 mr-2 text-green-600" />
+                                      Mark Reviewed
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem
+                                      onClick={() => handleStatusChange(item.id, "rejected")}
+                                    >
+                                      <XCircle className="h-4 w-4 mr-2 text-red-600" />
+                                      Mark Rejected
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem
+                                      onClick={() => handleDelete(item.id)}
+                                      className="text-destructive"
+                                    >
+                                      <Trash2 className="h-4 w-4 mr-2" />
+                                      Delete
+                                    </DropdownMenuItem>
+                                  </DropdownMenuContent>
+                                </DropdownMenu>
+                              </TableCell>
+                            </TableRow>
+                          );
+                        })}
+                      </TableBody>
+                    </Table>
+                  </div>
+                ) : (
+                  <div className="text-center py-12">
+                    <MessageSquare className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                    <p className="text-muted-foreground">No feedback submissions yet</p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="photos">
+            <LeaderPhotoManager />
+          </TabsContent>
+        </Tabs>
 
         {/* Legal Disclaimer */}
         <div className="text-center py-8 border-t">
