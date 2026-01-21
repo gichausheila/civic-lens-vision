@@ -108,9 +108,14 @@ export type Database = {
           county_id: string | null
           created_at: string
           id: string
+          impeachment_date: string | null
+          impeachment_reasons: Json | null
+          impeachment_timeline: Json | null
+          is_impeached: boolean | null
           is_national: boolean | null
           manifesto: Json | null
           name: string
+          official_documents: Json | null
           party: string | null
           photo_url: string | null
           position: string
@@ -126,9 +131,14 @@ export type Database = {
           county_id?: string | null
           created_at?: string
           id?: string
+          impeachment_date?: string | null
+          impeachment_reasons?: Json | null
+          impeachment_timeline?: Json | null
+          is_impeached?: boolean | null
           is_national?: boolean | null
           manifesto?: Json | null
           name: string
+          official_documents?: Json | null
           party?: string | null
           photo_url?: string | null
           position: string
@@ -144,9 +154,14 @@ export type Database = {
           county_id?: string | null
           created_at?: string
           id?: string
+          impeachment_date?: string | null
+          impeachment_reasons?: Json | null
+          impeachment_timeline?: Json | null
+          is_impeached?: boolean | null
           is_national?: boolean | null
           manifesto?: Json | null
           name?: string
+          official_documents?: Json | null
           party?: string | null
           photo_url?: string | null
           position?: string
