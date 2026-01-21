@@ -2,13 +2,21 @@ import { useState } from "react";
 import { Layout } from "@/components/layout/Layout";
 import { LeaderGrid } from "@/components/leaders/LeaderGrid";
 import { LeaderModal } from "@/components/leaders/LeaderModal";
-import { useLeaders } from "@/hooks/useLeaders";
+import { useRandomLeaders, useLeaders } from "@/hooks/useLeaders";
 import type { Leader } from "@/types/database";
-import { Eye, Users, MapPin } from "lucide-react";
+import { Eye, Users, MapPin, RefreshCw } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useQueryClient } from "@tanstack/react-query";
 
 const Index = () => {
-  const { data: leaders, isLoading } = useLeaders();
+  const { data: allLeaders } = useLeaders();
+  const { data: randomLeaders, isLoading, refetch, isFetching } = useRandomLeaders(12);
   const [selectedLeader, setSelectedLeader] = useState<Leader | null>(null);
+  const queryClient = useQueryClient();
+
+  const handleRefresh = () => {
+    queryClient.invalidateQueries({ queryKey: ["leaders", "random"] });
+  };
 
   return (
     <Layout>
@@ -36,7 +44,7 @@ const Index = () => {
         </div>
         <div className="p-6 rounded-xl bg-gradient-to-br from-secondary/10 to-secondary/5 text-center">
           <Users className="h-8 w-8 text-secondary-foreground mx-auto mb-2" />
-          <p className="text-2xl font-bold text-foreground">{leaders?.length || 0}</p>
+          <p className="text-2xl font-bold text-foreground">{allLeaders?.length || 0}</p>
           <p className="text-sm text-muted-foreground">Leaders</p>
         </div>
         <div className="p-6 rounded-xl bg-gradient-to-br from-accent/20 to-accent/10 text-center">
@@ -53,11 +61,23 @@ const Index = () => {
 
       {/* Leaders Section */}
       <section>
-        <h2 className="text-2xl font-bold text-foreground mb-6">
-          Political Leaders
-        </h2>
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-2xl font-bold text-foreground">
+            Discover Leaders
+          </h2>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleRefresh}
+            disabled={isFetching}
+            className="gap-2"
+          >
+            <RefreshCw className={`h-4 w-4 ${isFetching ? 'animate-spin' : ''}`} />
+            Shuffle
+          </Button>
+        </div>
         <LeaderGrid
-          leaders={leaders || []}
+          leaders={randomLeaders || []}
           isLoading={isLoading}
           onLeaderClick={setSelectedLeader}
         />
