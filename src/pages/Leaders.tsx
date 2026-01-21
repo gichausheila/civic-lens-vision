@@ -204,6 +204,16 @@ export default function Leaders() {
         </div>
       </section>
 
+      {/* Legal Disclaimer */}
+      <div className="text-center py-8 mt-8 border-t">
+        <h3 className="text-sm font-semibold text-foreground mb-2">Legal Disclaimer</h3>
+        <div className="text-sm text-muted-foreground max-w-2xl mx-auto space-y-1">
+          <p>CivicLens aggregates publicly available civic information for educational and awareness purposes only.</p>
+          <p>The platform does not make accusations, endorsements, or legal claims against any individual.</p>
+          <p>All users are encouraged to verify information using official government sources.</p>
+        </div>
+      </div>
+
       <LeaderModal
         leader={selectedLeader}
         open={!!selectedLeader}
