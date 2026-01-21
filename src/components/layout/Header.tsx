@@ -5,7 +5,6 @@ const navItems = [
   { to: "/", label: "Home", icon: Home },
   { to: "/search", label: "Search", icon: Search },
   { to: "/national-leaders", label: "National", icon: Crown },
-  { to: "/leaders", label: "Governors", icon: Users },
   { to: "/surveys", label: "Surveys", icon: ClipboardList },
   { to: "/feedback", label: "Feedback", icon: MessageSquare },
 ];
