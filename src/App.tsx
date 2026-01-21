@@ -7,6 +7,7 @@ import Index from "./pages/Index";
 import Search from "./pages/Search";
 import Leaders from "./pages/Leaders";
 import LeaderProfile from "./pages/LeaderProfile";
+import ImpeachedLeaders from "./pages/ImpeachedLeaders";
 import Counties from "./pages/Counties";
 import Surveys from "./pages/Surveys";
 import CivicFacts from "./pages/CivicFacts";
@@ -25,6 +26,7 @@ const App = () => (
           <Route path="/search" element={<Search />} />
           <Route path="/leaders" element={<Leaders />} />
           <Route path="/leader/:id" element={<LeaderProfile />} />
+          <Route path="/impeached" element={<ImpeachedLeaders />} />
           <Route path="/counties" element={<Counties />} />
           <Route path="/surveys" element={<Surveys />} />
           <Route path="/civic-facts" element={<CivicFacts />} />

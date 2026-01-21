@@ -1,10 +1,11 @@
 import { NavLink } from "@/components/NavLink";
-import { Home, Search, Users, MapPin, Vote, BookOpen } from "lucide-react";
+import { Home, Search, Users, AlertTriangle, MapPin, Vote, BookOpen } from "lucide-react";
 
 const navItems = [
   { to: "/", label: "Home", icon: Home },
   { to: "/search", label: "Search", icon: Search },
   { to: "/leaders", label: "Leaders", icon: Users },
+  { to: "/impeached", label: "Impeached", icon: AlertTriangle },
   { to: "/counties", label: "Counties", icon: MapPin },
   { to: "/surveys", label: "Survey", icon: Vote },
   { to: "/civic-facts", label: "CivicFacts", icon: BookOpen },
