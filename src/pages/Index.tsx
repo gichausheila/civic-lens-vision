@@ -76,12 +76,14 @@ const Index = () => {
         </div>
       </div>
 
-      {/* Neutral Disclaimer */}
+      {/* Legal Disclaimer */}
       <div className="text-center py-8 border-t">
-        <p className="text-sm text-muted-foreground max-w-2xl mx-auto">
-          CivicLens is a non-partisan civic education platform. We do not endorse any political party or candidate. 
-          Our goal is to promote transparency and informed civic participation.
-        </p>
+        <h3 className="text-sm font-semibold text-foreground mb-2">Legal Disclaimer</h3>
+        <div className="text-sm text-muted-foreground max-w-2xl mx-auto space-y-1">
+          <p>CivicLens aggregates publicly available civic information for educational and awareness purposes only.</p>
+          <p>The platform does not make accusations, endorsements, or legal claims against any individual.</p>
+          <p>All users are encouraged to verify information using official government sources.</p>
+        </div>
       </div>
 
       <LeaderModal

@@ -248,19 +248,24 @@ export default function CivicFacts() {
         </TabsContent>
       </Tabs>
 
-      {/* Disclaimer */}
+      {/* Legal Disclaimer */}
       <div className="mt-12 p-4 rounded-lg bg-muted/50 border">
-        <p className="text-sm text-muted-foreground text-center">
-          <strong>Disclaimer:</strong> The information provided here is for educational purposes only. 
-          For official and legally binding documents, please visit{" "}
-          <a href="http://www.kenyalaw.org" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
-            Kenya Law
-          </a>{" "}
-          or the{" "}
-          <a href="http://www.parliament.go.ke" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
-            Parliament of Kenya
-          </a>.
-        </p>
+        <h3 className="text-sm font-semibold text-foreground mb-2 text-center">Legal Disclaimer</h3>
+        <div className="text-sm text-muted-foreground text-center space-y-1">
+          <p>CivicLens aggregates publicly available civic information for educational and awareness purposes only.</p>
+          <p>The platform does not make accusations, endorsements, or legal claims against any individual.</p>
+          <p>All users are encouraged to verify information using official government sources.</p>
+          <p className="pt-2">
+            For official and legally binding documents, please visit{" "}
+            <a href="http://www.kenyalaw.org" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+              Kenya Law
+            </a>{" "}
+            or the{" "}
+            <a href="http://www.parliament.go.ke" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+              Parliament of Kenya
+            </a>.
+          </p>
+        </div>
       </div>
     </Layout>
   );
