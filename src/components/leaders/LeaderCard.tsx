@@ -10,6 +10,17 @@ interface LeaderCardProps {
   compact?: boolean;
 }
 
+// Extract constituency from MP position (e.g., "MP - Westlands" -> "Westlands")
+function getConstituencyFromPosition(position: string): string | null {
+  const mpMatch = position.match(/^MP\s*[-–—]\s*(.+)$/i);
+  return mpMatch ? mpMatch[1].trim() : null;
+}
+
+// Check if position is an MP
+function isMP(position: string): boolean {
+  return position.toLowerCase().startsWith("mp");
+}
+
 export function LeaderCard({ leader, onClick, compact }: LeaderCardProps) {
   const initials = leader.name
     .split(" ")
@@ -17,6 +28,9 @@ export function LeaderCard({ leader, onClick, compact }: LeaderCardProps) {
     .join("")
     .slice(0, 2)
     .toUpperCase();
+
+  const constituency = getConstituencyFromPosition(leader.position);
+  const isMPPosition = isMP(leader.position);
 
   if (compact) {
     return (
@@ -36,6 +50,11 @@ export function LeaderCard({ leader, onClick, compact }: LeaderCardProps) {
               {leader.name}
             </h4>
             <p className="text-xs text-muted-foreground truncate">{leader.position}</p>
+            {isMPPosition && leader.county && (
+              <p className="text-xs text-primary/80 truncate">
+                {constituency ? `${constituency}, ` : ""}{leader.county.name} County
+              </p>
+            )}
           </div>
         </div>
       </div>
@@ -76,7 +95,14 @@ export function LeaderCard({ leader, onClick, compact }: LeaderCardProps) {
           </div>
 
           <div className="flex items-center justify-between">
-            {leader.county ? (
+            {isMPPosition && leader.county ? (
+              <span className="text-sm text-muted-foreground flex items-center gap-1">
+                <MapPin className="h-3 w-3" />
+                <span className="truncate">
+                  {constituency ? `${constituency}, ` : ""}{leader.county.name}
+                </span>
+              </span>
+            ) : leader.county ? (
               <span className="text-sm text-muted-foreground flex items-center gap-1">
                 <MapPin className="h-3 w-3" />
                 {leader.county.name}

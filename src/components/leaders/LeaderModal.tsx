@@ -17,6 +17,17 @@ interface LeaderModalProps {
   onOpenChange: (open: boolean) => void;
 }
 
+// Extract constituency from MP position (e.g., "MP - Westlands" -> "Westlands")
+function getConstituencyFromPosition(position: string): string | null {
+  const mpMatch = position.match(/^MP\s*[-–—]\s*(.+)$/i);
+  return mpMatch ? mpMatch[1].trim() : null;
+}
+
+// Check if position is an MP
+function isMP(position: string): boolean {
+  return position.toLowerCase().startsWith("mp");
+}
+
 export function LeaderModal({ leader, open, onOpenChange }: LeaderModalProps) {
   if (!leader) return null;
 
@@ -26,6 +37,9 @@ export function LeaderModal({ leader, open, onOpenChange }: LeaderModalProps) {
     .join("")
     .slice(0, 2)
     .toUpperCase();
+
+  const constituency = getConstituencyFromPosition(leader.position);
+  const isMPPosition = isMP(leader.position);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -42,12 +56,17 @@ export function LeaderModal({ leader, open, onOpenChange }: LeaderModalProps) {
               <DialogTitle className="text-2xl">{leader.name}</DialogTitle>
               <p className="text-muted-foreground">{leader.position}</p>
               <div className="flex flex-wrap gap-2 mt-2">
-                {leader.county && (
+                {isMPPosition && leader.county ? (
+                  <Badge variant="secondary" className="flex items-center gap-1">
+                    <MapPin className="h-3 w-3" />
+                    {constituency ? `${constituency} Constituency, ` : ""}{leader.county.name} County
+                  </Badge>
+                ) : leader.county ? (
                   <Badge variant="secondary" className="flex items-center gap-1">
                     <MapPin className="h-3 w-3" />
                     {leader.county.name}
                   </Badge>
-                )}
+                ) : null}
                 {leader.is_national && <Badge>National</Badge>}
                 {leader.party && <Badge variant="outline">{leader.party}</Badge>}
               </div>
