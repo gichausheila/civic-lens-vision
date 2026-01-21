@@ -31,7 +31,13 @@ export interface Leader {
   party: string | null;
   photo_url: string | null;
   bio: string | null;
+  // Legacy manifesto field
   manifesto: ManifestoItem[];
+  // New structured manifesto fields
+  manifesto_summary: string | null;
+  manifesto_promises: ManifestoPromise[];
+  manifesto_source: string | null;
+  manifesto_available: boolean;
   achievements: Achievement[];
   controversial_statements: ControversialStatement[];
   is_national: boolean;
@@ -46,9 +52,17 @@ export interface Leader {
   county?: County;
 }
 
+// Legacy manifesto item (for backward compatibility)
 export interface ManifestoItem {
   title: string;
   description: string;
+}
+
+// Structured manifesto promise with category
+export interface ManifestoPromise {
+  category: string; // One of MANIFESTO_CATEGORIES ids
+  text: string;
+  status?: "not_started" | "in_progress" | "completed";
 }
 
 export interface Achievement {

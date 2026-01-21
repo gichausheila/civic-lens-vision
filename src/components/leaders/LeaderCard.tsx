@@ -94,6 +94,13 @@ export function LeaderCard({ leader, onClick, compact }: LeaderCardProps) {
             </p>
           </div>
 
+          {/* Manifesto Summary Snippet */}
+          {leader.manifesto_summary && (
+            <p className="text-xs text-muted-foreground line-clamp-2 italic">
+              {leader.manifesto_summary}
+            </p>
+          )}
+
           <div className="flex items-center justify-between">
             {isMPPosition && leader.county ? (
               <span className="text-sm text-muted-foreground flex items-center gap-1">
