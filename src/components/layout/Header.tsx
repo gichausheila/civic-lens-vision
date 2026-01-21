@@ -1,12 +1,11 @@
 import { NavLink } from "@/components/NavLink";
-import { Home, Search, Users, Crown, ClipboardList, MessageSquare } from "lucide-react";
+import { Home, Users, MapPin, Info } from "lucide-react";
 
 const navItems = [
   { to: "/", label: "Home", icon: Home },
-  { to: "/search", label: "Search", icon: Search },
-  { to: "/national-leaders", label: "National", icon: Crown },
-  { to: "/surveys", label: "Surveys", icon: ClipboardList },
-  { to: "/feedback", label: "Feedback", icon: MessageSquare },
+  { to: "/leaders", label: "Leaders", icon: Users },
+  { to: "/counties", label: "Counties", icon: MapPin },
+  { to: "/about", label: "About", icon: Info },
 ];
 
 export function Header() {
