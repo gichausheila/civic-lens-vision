@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import type { Leader } from "@/types/database";
-import { MapPin, Mail, Phone, Twitter, Facebook, Instagram, Linkedin } from "lucide-react";
+import { MapPin } from "lucide-react";
 
 interface LeaderModalProps {
   leader: Leader | null;
@@ -62,7 +62,6 @@ export function LeaderModal({ leader, open, onOpenChange }: LeaderModalProps) {
               <TabsTrigger value="manifesto">Manifesto</TabsTrigger>
               <TabsTrigger value="achievements">Achievements</TabsTrigger>
               <TabsTrigger value="statements">Statements</TabsTrigger>
-              <TabsTrigger value="contact">Contact</TabsTrigger>
             </TabsList>
 
             <TabsContent value="bio" className="mt-4">
@@ -127,86 +126,6 @@ export function LeaderModal({ leader, open, onOpenChange }: LeaderModalProps) {
                   No controversial statements recorded.
                 </p>
               )}
-            </TabsContent>
-
-            <TabsContent value="contact" className="mt-4 space-y-4">
-              <div className="space-y-3">
-                {leader.contact_email && (
-                  <a
-                    href={`mailto:${leader.contact_email}`}
-                    className="flex items-center gap-3 p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors"
-                  >
-                    <Mail className="h-5 w-5 text-primary" />
-                    <span>{leader.contact_email}</span>
-                  </a>
-                )}
-                {leader.contact_phone && (
-                  <a
-                    href={`tel:${leader.contact_phone}`}
-                    className="flex items-center gap-3 p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors"
-                  >
-                    <Phone className="h-5 w-5 text-primary" />
-                    <span>{leader.contact_phone}</span>
-                  </a>
-                )}
-
-                {leader.social_media && Object.keys(leader.social_media).length > 0 && (
-                  <div className="pt-4">
-                    <h4 className="text-sm font-medium mb-3">Social Media</h4>
-                    <div className="flex gap-3">
-                      {leader.social_media.twitter && (
-                        <a
-                          href={leader.social_media.twitter}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="p-2 rounded-lg bg-muted hover:bg-primary/10 transition-colors"
-                        >
-                          <Twitter className="h-5 w-5" />
-                        </a>
-                      )}
-                      {leader.social_media.facebook && (
-                        <a
-                          href={leader.social_media.facebook}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="p-2 rounded-lg bg-muted hover:bg-primary/10 transition-colors"
-                        >
-                          <Facebook className="h-5 w-5" />
-                        </a>
-                      )}
-                      {leader.social_media.instagram && (
-                        <a
-                          href={leader.social_media.instagram}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="p-2 rounded-lg bg-muted hover:bg-primary/10 transition-colors"
-                        >
-                          <Instagram className="h-5 w-5" />
-                        </a>
-                      )}
-                      {leader.social_media.linkedin && (
-                        <a
-                          href={leader.social_media.linkedin}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="p-2 rounded-lg bg-muted hover:bg-primary/10 transition-colors"
-                        >
-                          <Linkedin className="h-5 w-5" />
-                        </a>
-                      )}
-                    </div>
-                  </div>
-                )}
-
-                {!leader.contact_email &&
-                  !leader.contact_phone &&
-                  (!leader.social_media ||
-                    Object.keys(leader.social_media).length === 0) && (
-                    <p className="text-muted-foreground">
-                      No contact information available.
-                    </p>
-                  )}
-              </div>
             </TabsContent>
           </Tabs>
         </ScrollArea>

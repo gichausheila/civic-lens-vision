@@ -98,12 +98,28 @@ export type Database = {
           },
         ]
       }
+      feedback_rate_limits: {
+        Row: {
+          id: string
+          identifier: string
+          submitted_at: string
+        }
+        Insert: {
+          id?: string
+          identifier: string
+          submitted_at?: string
+        }
+        Update: {
+          id?: string
+          identifier?: string
+          submitted_at?: string
+        }
+        Relationships: []
+      }
       leaders: {
         Row: {
           achievements: Json | null
           bio: string | null
-          contact_email: string | null
-          contact_phone: string | null
           controversial_statements: Json | null
           county_id: string | null
           created_at: string
@@ -119,14 +135,11 @@ export type Database = {
           party: string | null
           photo_url: string | null
           position: string
-          social_media: Json | null
           updated_at: string
         }
         Insert: {
           achievements?: Json | null
           bio?: string | null
-          contact_email?: string | null
-          contact_phone?: string | null
           controversial_statements?: Json | null
           county_id?: string | null
           created_at?: string
@@ -142,14 +155,11 @@ export type Database = {
           party?: string | null
           photo_url?: string | null
           position: string
-          social_media?: Json | null
           updated_at?: string
         }
         Update: {
           achievements?: Json | null
           bio?: string | null
-          contact_email?: string | null
-          contact_phone?: string | null
           controversial_statements?: Json | null
           county_id?: string | null
           created_at?: string
@@ -165,7 +175,6 @@ export type Database = {
           party?: string | null
           photo_url?: string | null
           position?: string
-          social_media?: Json | null
           updated_at?: string
         }
         Relationships: [
@@ -177,6 +186,33 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          display_name: string | null
+          email: string | null
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          display_name?: string | null
+          email?: string | null
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          display_name?: string | null
+          email?: string | null
+          id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       survey_votes: {
         Row: {
@@ -237,15 +273,46 @@ export type Database = {
         }
         Relationships: []
       }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      check_feedback_rate_limit: {
+        Args: { _identifier: string }
+        Returns: boolean
+      }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "moderator" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -372,6 +439,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "moderator", "user"],
+    },
   },
 } as const

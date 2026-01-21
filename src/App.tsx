@@ -11,6 +11,11 @@ import ImpeachedLeaders from "./pages/ImpeachedLeaders";
 import Counties from "./pages/Counties";
 import Surveys from "./pages/Surveys";
 import CivicFacts from "./pages/CivicFacts";
+import Feedback from "./pages/Feedback";
+import About from "./pages/About";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import AdminLogin from "./pages/AdminLogin";
+import AdminDashboard from "./pages/AdminDashboard";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -30,6 +35,11 @@ const App = () => (
           <Route path="/counties" element={<Counties />} />
           <Route path="/surveys" element={<Surveys />} />
           <Route path="/civic-facts" element={<CivicFacts />} />
+          <Route path="/feedback" element={<Feedback />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/privacy" element={<PrivacyPolicy />} />
+          <Route path="/admin/login" element={<AdminLogin />} />
+          <Route path="/admin" element={<AdminDashboard />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

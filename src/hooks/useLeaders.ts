@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import type { Leader, County, ManifestoItem, Achievement, ControversialStatement, SocialMedia, ImpeachmentTimelineEvent, OfficialDocument } from "@/types/database";
+import type { Leader, County, ManifestoItem, Achievement, ControversialStatement, ImpeachmentTimelineEvent, OfficialDocument } from "@/types/database";
 
 function transformLeader(data: Record<string, unknown>): Leader {
   const counties = data.counties as County | null;
@@ -15,10 +15,7 @@ function transformLeader(data: Record<string, unknown>): Leader {
     manifesto: Array.isArray(data.manifesto) ? (data.manifesto as ManifestoItem[]) : [],
     achievements: Array.isArray(data.achievements) ? (data.achievements as Achievement[]) : [],
     controversial_statements: Array.isArray(data.controversial_statements) ? (data.controversial_statements as ControversialStatement[]) : [],
-    social_media: (typeof data.social_media === 'object' && data.social_media !== null ? data.social_media : {}) as SocialMedia,
     is_national: (data.is_national as boolean) ?? false,
-    contact_email: data.contact_email as string | null,
-    contact_phone: data.contact_phone as string | null,
     is_impeached: (data.is_impeached as boolean) ?? false,
     impeachment_date: data.impeachment_date as string | null,
     impeachment_reasons: Array.isArray(data.impeachment_reasons) ? (data.impeachment_reasons as string[]) : [],

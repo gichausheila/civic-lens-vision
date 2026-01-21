@@ -35,9 +35,6 @@ export interface Leader {
   achievements: Achievement[];
   controversial_statements: ControversialStatement[];
   is_national: boolean;
-  contact_email: string | null;
-  contact_phone: string | null;
-  social_media: SocialMedia;
   is_impeached: boolean;
   impeachment_date: string | null;
   impeachment_reasons: string[];
@@ -65,13 +62,6 @@ export interface ControversialStatement {
   date: string;
   media_url?: string;
   source?: string;
-}
-
-export interface SocialMedia {
-  twitter?: string;
-  facebook?: string;
-  instagram?: string;
-  linkedin?: string;
 }
 
 export interface Survey {
@@ -117,4 +107,23 @@ export interface FeedbackInput {
   message: string;
   leader_id?: string;
   county_id?: string;
+}
+
+// User roles for admin access control
+export type AppRole = 'admin' | 'moderator' | 'user';
+
+export interface UserRole {
+  id: string;
+  user_id: string;
+  role: AppRole;
+  created_at: string;
+}
+
+export interface Profile {
+  id: string;
+  user_id: string;
+  email: string | null;
+  display_name: string | null;
+  created_at: string;
+  updated_at: string;
 }
