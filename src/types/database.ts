@@ -11,6 +11,18 @@ export interface County {
   created_at: string;
 }
 
+export interface ImpeachmentTimelineEvent {
+  date: string;
+  event: string;
+}
+
+export interface OfficialDocument {
+  title: string;
+  url: string;
+  source: string;
+  type: "senate" | "court" | "gazette";
+}
+
 export interface Leader {
   id: string;
   name: string;
@@ -26,6 +38,11 @@ export interface Leader {
   contact_email: string | null;
   contact_phone: string | null;
   social_media: SocialMedia;
+  is_impeached: boolean;
+  impeachment_date: string | null;
+  impeachment_reasons: string[];
+  impeachment_timeline: ImpeachmentTimelineEvent[];
+  official_documents: OfficialDocument[];
   created_at: string;
   updated_at: string;
   // Joined data
