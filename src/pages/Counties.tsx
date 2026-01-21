@@ -213,7 +213,7 @@ const Counties = () => {
                   </h4>
                   <div className="space-y-2">
                     {mps.map((mp) => (
-                      <LeaderRow key={mp.id} leader={mp} onClose={() => setSelectedCounty(null)} />
+                      <LeaderRow key={mp.id} leader={mp} onClose={() => setSelectedCounty(null)} countyName={selectedCounty?.name} />
                     ))}
                   </div>
                 </div>
@@ -226,8 +226,20 @@ const Counties = () => {
   );
 };
 
-function LeaderRow({ leader, position, onClose }: { leader: Leader; position?: string; onClose: () => void }) {
+function LeaderRow({ leader, position, onClose, countyName }: { leader: Leader; position?: string; onClose: () => void; countyName?: string }) {
   const initials = leader.name.split(" ").map((n) => n[0]).join("").slice(0, 2);
+  
+  // Parse constituency from position for MPs (e.g., "MP - Westlands" -> "Westlands Constituency")
+  const getConstituency = () => {
+    if (leader.position.startsWith("MP - ")) {
+      const constituencyName = leader.position.replace("MP - ", "");
+      if (constituencyName === "Nominated") return null;
+      return constituencyName;
+    }
+    return null;
+  };
+  
+  const constituency = getConstituency();
   
   // Generate parliament website search link based on position
   const getParliamentLink = () => {
@@ -280,6 +292,13 @@ function LeaderRow({ leader, position, onClose }: { leader: Leader; position?: s
       >
         <p className="font-medium">{leader.name}</p>
         <p className="text-sm text-muted-foreground">{position || leader.position}</p>
+        {/* Show constituency and county for MPs */}
+        {constituency && (
+          <p className="text-xs text-primary/80 flex items-center gap-1 mt-0.5">
+            <MapPin className="h-3 w-3" />
+            {constituency} Constituency{countyName && `, ${countyName} County`}
+          </p>
+        )}
       </Link>
       
       {leader.party && (
