@@ -77,7 +77,7 @@ export function LeaderGrid({
 
   if (isLoading) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+      <div className="grid grid-cols-3 gap-2 sm:gap-4 md:gap-6">
         {Array.from({ length: 6 }).map((_, i) => (
           <LeaderCardSkeleton key={i} />
         ))}
@@ -95,13 +95,8 @@ export function LeaderGrid({
 
   return (
     <div className="space-y-6">
-      {/* 
-        Responsive Grid:
-        - Mobile (< 768px): 1 column
-        - Tablet (768px - 1023px): 2 columns  
-        - Desktop (≥ 1024px): 3 columns
-      */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+      {/* 3-column grid on all devices with infinite scroll */}
+      <div className="grid grid-cols-3 gap-2 sm:gap-4 md:gap-6">
         {displayedLeaders.map((leader) => (
           <LeaderCard
             key={leader.id}
