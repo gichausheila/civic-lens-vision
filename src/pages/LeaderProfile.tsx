@@ -4,17 +4,9 @@ import { useLeader } from "@/hooks/useLeaders";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { ArrowLeft, MapPin, Calendar, CheckCircle2, Clock, Circle, AlertTriangle, Award, Scale } from "lucide-react";
+import { ArrowLeft, MapPin, Calendar, CheckCircle2, AlertTriangle, Award, Scale } from "lucide-react";
 import { LeaderFeedback } from "@/components/feedback/LeaderFeedback";
-
-// Placeholder data for manifesto promises
-const placeholderManifesto = [
-  { title: "Improve Healthcare Access", description: "Expand county health facilities and improve service delivery", status: "in_progress" },
-  { title: "Road Infrastructure", description: "Tarmac 500km of rural access roads", status: "in_progress" },
-  { title: "Youth Employment", description: "Create 10,000 jobs through county programs", status: "not_started" },
-  { title: "Water & Sanitation", description: "Increase water access to 80% of residents", status: "completed" },
-  { title: "Education Support", description: "Provide bursaries to 5,000 students annually", status: "in_progress" },
-];
+import { ManifestoSection } from "@/components/leaders/ManifestoSection";
 
 // Placeholder performance actions
 const placeholderPerformance = [
@@ -29,12 +21,6 @@ const placeholderLegalInfo = [
   { text: "No pending court cases as of record date", type: "clear" },
   { text: "Publicly declared assets as required by law", type: "clear" },
 ];
-
-const statusConfig = {
-  completed: { label: "Completed", icon: CheckCircle2, className: "text-primary bg-primary/10" },
-  in_progress: { label: "In Progress", icon: Clock, className: "text-foreground bg-muted" },
-  not_started: { label: "Not Started", icon: Circle, className: "text-muted-foreground bg-muted/50" },
-};
 
 const LeaderProfile = () => {
   const { id } = useParams<{ id: string }>();
@@ -72,11 +58,6 @@ const LeaderProfile = () => {
     .slice(0, 2)
     .toUpperCase();
 
-  // Use actual data if available, otherwise use placeholder
-  const manifesto = leader.manifesto?.length > 0 
-    ? leader.manifesto.map((m) => ({ ...m, status: "in_progress" })) 
-    : placeholderManifesto;
-    
   const performance = leader.achievements?.length > 0 
     ? leader.achievements 
     : placeholderPerformance;
@@ -147,36 +128,8 @@ const LeaderProfile = () => {
       </Card>
 
       <div className="grid lg:grid-cols-2 gap-6">
-        {/* Section B: Manifesto Promises */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <span className="text-2xl">📋</span>
-              Manifesto Promises
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {manifesto.map((item, index) => {
-              const status = statusConfig[item.status as keyof typeof statusConfig] || statusConfig.not_started;
-              const StatusIcon = status.icon;
-              
-              return (
-                <div key={index} className="p-4 rounded-lg border bg-card">
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="flex-1">
-                      <h4 className="font-semibold">{item.title}</h4>
-                      <p className="text-sm text-muted-foreground mt-1">{item.description}</p>
-                    </div>
-                    <Badge className={status.className} variant="secondary">
-                      <StatusIcon className="h-3 w-3 mr-1" />
-                      {status.label}
-                    </Badge>
-                  </div>
-                </div>
-              );
-            })}
-          </CardContent>
-        </Card>
+        {/* Section B: Manifesto & Policy Priorities */}
+        <ManifestoSection leader={leader} />
 
         {/* Section C: Performance & Actions */}
         <Card>

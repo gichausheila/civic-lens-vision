@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import type { Leader, County, ManifestoItem, Achievement, ControversialStatement, ImpeachmentTimelineEvent, OfficialDocument } from "@/types/database";
+import type { Leader, County, ManifestoItem, ManifestoPromise, Achievement, ControversialStatement, ImpeachmentTimelineEvent, OfficialDocument } from "@/types/database";
 
 function transformLeader(data: Record<string, unknown>): Leader {
   const counties = data.counties as County | null;
@@ -13,6 +13,10 @@ function transformLeader(data: Record<string, unknown>): Leader {
     photo_url: data.photo_url as string | null,
     bio: data.bio as string | null,
     manifesto: Array.isArray(data.manifesto) ? (data.manifesto as ManifestoItem[]) : [],
+    manifesto_summary: (data.manifesto_summary as string) || null,
+    manifesto_promises: Array.isArray(data.manifesto_promises) ? (data.manifesto_promises as ManifestoPromise[]) : [],
+    manifesto_source: (data.manifesto_source as string) || null,
+    manifesto_available: (data.manifesto_available as boolean) ?? false,
     achievements: Array.isArray(data.achievements) ? (data.achievements as Achievement[]) : [],
     controversial_statements: Array.isArray(data.controversial_statements) ? (data.controversial_statements as ControversialStatement[]) : [],
     is_national: (data.is_national as boolean) ?? false,

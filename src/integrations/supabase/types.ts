@@ -130,6 +130,10 @@ export type Database = {
           is_impeached: boolean | null
           is_national: boolean | null
           manifesto: Json | null
+          manifesto_available: boolean | null
+          manifesto_promises: Json | null
+          manifesto_source: string | null
+          manifesto_summary: string | null
           name: string
           official_documents: Json | null
           party: string | null
@@ -150,6 +154,10 @@ export type Database = {
           is_impeached?: boolean | null
           is_national?: boolean | null
           manifesto?: Json | null
+          manifesto_available?: boolean | null
+          manifesto_promises?: Json | null
+          manifesto_source?: string | null
+          manifesto_summary?: string | null
           name: string
           official_documents?: Json | null
           party?: string | null
@@ -170,6 +178,10 @@ export type Database = {
           is_impeached?: boolean | null
           is_national?: boolean | null
           manifesto?: Json | null
+          manifesto_available?: boolean | null
+          manifesto_promises?: Json | null
+          manifesto_source?: string | null
+          manifesto_summary?: string | null
           name?: string
           official_documents?: Json | null
           party?: string | null
