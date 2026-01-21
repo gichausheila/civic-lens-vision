@@ -39,7 +39,7 @@ export function LeaderCard({ leader, onClick, compact }: LeaderCardProps) {
         onClick={onClick}
       >
         <div className="flex items-center gap-3">
-          <Avatar className="h-10 w-10 border-2 border-background">
+          <Avatar className="h-10 w-10 flex-shrink-0 border-2 border-background">
             <AvatarImage src={leader.photo_url || undefined} alt={leader.name} />
             <AvatarFallback className="bg-primary text-primary-foreground text-sm font-bold">
               {initials}
@@ -63,62 +63,67 @@ export function LeaderCard({ leader, onClick, compact }: LeaderCardProps) {
 
   return (
     <Card
-      className="group cursor-pointer overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 hover:border-primary/50"
+      className="group cursor-pointer overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 hover:border-primary/50 w-full h-full flex flex-col"
       onClick={onClick}
     >
-      <CardContent className="p-0">
-        {/* Photo Section */}
-        <div className="relative h-48 bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center overflow-hidden">
-          <Avatar className="h-28 w-28 border-4 border-background shadow-lg transition-transform duration-300 group-hover:scale-105">
-            <AvatarImage src={leader.photo_url || undefined} alt={leader.name} />
-            <AvatarFallback className="bg-primary text-primary-foreground text-2xl font-bold">
+      <CardContent className="p-0 flex flex-col h-full">
+        {/* Photo Section - Fixed aspect ratio for consistency */}
+        <div className="relative aspect-[4/3] bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center overflow-hidden">
+          <Avatar className="h-24 w-24 sm:h-28 sm:w-28 border-4 border-background shadow-lg transition-transform duration-300 group-hover:scale-105">
+            <AvatarImage 
+              src={leader.photo_url || undefined} 
+              alt={leader.name}
+              className="object-cover"
+            />
+            <AvatarFallback className="bg-primary text-primary-foreground text-xl sm:text-2xl font-bold">
               {initials}
             </AvatarFallback>
           </Avatar>
           {leader.is_national && (
-            <Badge className="absolute top-3 right-3 bg-accent text-accent-foreground">
+            <Badge className="absolute top-3 right-3 bg-accent text-accent-foreground text-xs">
               National
             </Badge>
           )}
         </div>
 
-        {/* Info Section */}
-        <div className="p-4 space-y-3">
-          <div>
-            <h3 className="font-semibold text-lg text-foreground line-clamp-1 group-hover:text-primary transition-colors">
+        {/* Info Section - Flexible height with consistent padding */}
+        <div className="p-4 space-y-2 flex-1 flex flex-col">
+          <div className="space-y-1">
+            <h3 className="font-semibold text-base sm:text-lg text-foreground line-clamp-1 group-hover:text-primary transition-colors">
               {leader.name}
             </h3>
-            <p className="text-sm text-muted-foreground flex items-center gap-1">
-              <User className="h-3 w-3" />
-              {leader.position}
+            <p className="text-xs sm:text-sm text-muted-foreground flex items-center gap-1">
+              <User className="h-3 w-3 flex-shrink-0" />
+              <span className="truncate">{leader.position}</span>
             </p>
           </div>
 
-          {/* Manifesto Summary Snippet */}
+          {/* Manifesto Summary Snippet - Fixed height with line clamp */}
           {leader.manifesto_summary && (
-            <p className="text-xs text-muted-foreground line-clamp-2 italic">
+            <p className="text-xs text-muted-foreground line-clamp-2 italic flex-shrink-0">
               {leader.manifesto_summary}
             </p>
           )}
 
-          <div className="flex items-center justify-between">
+          {/* Footer - Pushed to bottom */}
+          <div className="flex items-center justify-between gap-2 mt-auto pt-2">
             {isMPPosition && leader.county ? (
-              <span className="text-sm text-muted-foreground flex items-center gap-1">
-                <MapPin className="h-3 w-3" />
+              <span className="text-xs sm:text-sm text-muted-foreground flex items-center gap-1 min-w-0">
+                <MapPin className="h-3 w-3 flex-shrink-0" />
                 <span className="truncate">
                   {constituency ? `${constituency}, ` : ""}{leader.county.name}
                 </span>
               </span>
             ) : leader.county ? (
-              <span className="text-sm text-muted-foreground flex items-center gap-1">
-                <MapPin className="h-3 w-3" />
-                {leader.county.name}
+              <span className="text-xs sm:text-sm text-muted-foreground flex items-center gap-1 min-w-0">
+                <MapPin className="h-3 w-3 flex-shrink-0" />
+                <span className="truncate">{leader.county.name}</span>
               </span>
             ) : (
-              <span className="text-sm text-muted-foreground">National Level</span>
+              <span className="text-xs sm:text-sm text-muted-foreground">National Level</span>
             )}
             {leader.party && (
-              <Badge variant="outline" className="text-xs">
+              <Badge variant="outline" className="text-xs flex-shrink-0 max-w-[100px] truncate">
                 {leader.party}
               </Badge>
             )}
