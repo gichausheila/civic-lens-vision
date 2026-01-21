@@ -164,8 +164,8 @@ const About = () => {
         </CardContent>
       </Card>
 
-      {/* Disclaimer */}
-      <Card className="border-dashed bg-muted/30">
+      {/* Important Notice */}
+      <Card className="border-dashed bg-muted/30 mb-8">
         <CardContent className="pt-6">
           <h2 className="text-lg font-semibold mb-3">Important Notice</h2>
           <div className="space-y-3 text-sm text-muted-foreground">
@@ -186,6 +186,16 @@ const About = () => {
           </div>
         </CardContent>
       </Card>
+
+      {/* Legal Disclaimer */}
+      <div className="text-center py-8 border-t">
+        <h3 className="text-sm font-semibold text-foreground mb-2">Legal Disclaimer</h3>
+        <div className="text-sm text-muted-foreground max-w-2xl mx-auto space-y-1">
+          <p>CivicLens aggregates publicly available civic information for educational and awareness purposes only.</p>
+          <p>The platform does not make accusations, endorsements, or legal claims against any individual.</p>
+          <p>All users are encouraged to verify information using official government sources.</p>
+        </div>
+      </div>
     </Layout>
   );
 };
