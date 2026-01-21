@@ -3,7 +3,15 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { AlertTriangle, FileText, Scale, Calendar, MapPin } from "lucide-react";
+import { AlertTriangle, FileText, Scale, Calendar, MapPin, ExternalLink, Gavel } from "lucide-react";
+import { Button } from "@/components/ui/button";
+
+interface OfficialDocument {
+  title: string;
+  url: string;
+  source: string;
+  type: "senate" | "court" | "gazette";
+}
 
 interface ImpeachedLeader {
   id: string;
@@ -17,6 +25,7 @@ interface ImpeachedLeader {
   manifesto: string[];
   developments: { date: string; description: string }[];
   currentStatus: string;
+  officialDocuments: OfficialDocument[];
 }
 
 // Placeholder data for impeached leaders during the current term (2022-2027)
@@ -46,6 +55,26 @@ const impeachedLeaders: ImpeachedLeader[] = [
       { date: "2024-01-15", description: "Senate upheld impeachment" },
     ],
     currentStatus: "Impeached - Removed from office",
+    officialDocuments: [
+      {
+        title: "Senate Hansard - Impeachment Proceedings",
+        url: "http://www.parliament.go.ke/the-senate/house-business/hansard",
+        source: "Parliament of Kenya",
+        type: "senate",
+      },
+      {
+        title: "County Assembly Motion Records",
+        url: "http://www.parliament.go.ke/the-senate/committees",
+        source: "Parliament of Kenya",
+        type: "senate",
+      },
+      {
+        title: "Court Petition (if applicable)",
+        url: "http://kenyalaw.org/caselaw/",
+        source: "Kenya Law Reports",
+        type: "court",
+      },
+    ],
   },
   {
     id: "2",
@@ -73,6 +102,32 @@ const impeachedLeaders: ImpeachedLeader[] = [
       { date: "2024-02-08", description: "Senate upheld second impeachment" },
     ],
     currentStatus: "Impeached - Removed from office",
+    officialDocuments: [
+      {
+        title: "Senate Special Sitting Hansard - Meru Governor Impeachment",
+        url: "http://www.parliament.go.ke/the-senate/house-business/hansard",
+        source: "Parliament of Kenya",
+        type: "senate",
+      },
+      {
+        title: "First Impeachment Senate Ruling (2023)",
+        url: "http://www.parliament.go.ke/the-senate/house-business/order-papers",
+        source: "Parliament of Kenya",
+        type: "senate",
+      },
+      {
+        title: "Kawira Mwangaza v Senate of Kenya & Others",
+        url: "http://kenyalaw.org/caselaw/",
+        source: "Kenya Law Reports",
+        type: "court",
+      },
+      {
+        title: "County Assembly Impeachment Motion",
+        url: "http://www.parliament.go.ke/the-senate/committees",
+        source: "Parliament of Kenya",
+        type: "senate",
+      },
+    ],
   },
   {
     id: "3",
@@ -98,6 +153,20 @@ const impeachedLeaders: ImpeachedLeader[] = [
       { date: "2023-09-20", description: "Senate upheld impeachment" },
     ],
     currentStatus: "Impeached - Removed from office",
+    officialDocuments: [
+      {
+        title: "Senate Hansard - Deputy Governor Impeachment",
+        url: "http://www.parliament.go.ke/the-senate/house-business/hansard",
+        source: "Parliament of Kenya",
+        type: "senate",
+      },
+      {
+        title: "Kericho County Assembly Records",
+        url: "http://www.parliament.go.ke/the-senate/committees",
+        source: "Parliament of Kenya",
+        type: "senate",
+      },
+    ],
   },
 ];
 
@@ -108,6 +177,32 @@ function getInitials(name: string): string {
     .join("")
     .toUpperCase()
     .slice(0, 2);
+}
+
+function getDocumentIcon(type: OfficialDocument["type"]) {
+  switch (type) {
+    case "senate":
+      return <FileText className="h-4 w-4" />;
+    case "court":
+      return <Gavel className="h-4 w-4" />;
+    case "gazette":
+      return <FileText className="h-4 w-4" />;
+    default:
+      return <FileText className="h-4 w-4" />;
+  }
+}
+
+function getDocumentBadgeVariant(type: OfficialDocument["type"]) {
+  switch (type) {
+    case "senate":
+      return "default";
+    case "court":
+      return "secondary";
+    case "gazette":
+      return "outline";
+    default:
+      return "outline";
+  }
 }
 
 export default function ImpeachedLeaders() {
@@ -247,6 +342,75 @@ export default function ImpeachedLeaders() {
                             <p className="text-sm">{dev.description}</p>
                           </div>
                         ))}
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+
+                  <AccordionItem value="documents">
+                    <AccordionTrigger className="text-base font-semibold">
+                      <span className="flex items-center gap-2">
+                        <Gavel className="h-4 w-4 text-primary" />
+                        Official Documents & Proceedings
+                      </span>
+                    </AccordionTrigger>
+                    <AccordionContent>
+                      <div className="space-y-3">
+                        <p className="text-sm text-muted-foreground mb-4">
+                          Access official records from the Senate of Kenya and Kenya Law Reports.
+                        </p>
+                        {leader.officialDocuments.map((doc, idx) => (
+                          <a
+                            key={idx}
+                            href={doc.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center justify-between p-3 rounded-lg border border-border hover:bg-muted/50 transition-colors group"
+                          >
+                            <div className="flex items-center gap-3">
+                              <div className="p-2 rounded-md bg-primary/10 text-primary">
+                                {getDocumentIcon(doc.type)}
+                              </div>
+                              <div>
+                                <p className="font-medium text-sm group-hover:text-primary transition-colors">
+                                  {doc.title}
+                                </p>
+                                <p className="text-xs text-muted-foreground">{doc.source}</p>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Badge variant={getDocumentBadgeVariant(doc.type) as "default" | "secondary" | "outline"}>
+                                {doc.type === "senate" ? "Senate" : doc.type === "court" ? "Court" : "Gazette"}
+                              </Badge>
+                              <ExternalLink className="h-4 w-4 text-muted-foreground group-hover:text-primary" />
+                            </div>
+                          </a>
+                        ))}
+                        <div className="mt-4 pt-4 border-t border-border">
+                          <p className="text-xs text-muted-foreground mb-2">Official Sources:</p>
+                          <div className="flex flex-wrap gap-2">
+                            <Button variant="outline" size="sm" asChild>
+                              <a href="http://www.parliament.go.ke/the-senate" target="_blank" rel="noopener noreferrer">
+                                <FileText className="h-3 w-3 mr-1" />
+                                Senate of Kenya
+                                <ExternalLink className="h-3 w-3 ml-1" />
+                              </a>
+                            </Button>
+                            <Button variant="outline" size="sm" asChild>
+                              <a href="http://kenyalaw.org" target="_blank" rel="noopener noreferrer">
+                                <Gavel className="h-3 w-3 mr-1" />
+                                Kenya Law Reports
+                                <ExternalLink className="h-3 w-3 ml-1" />
+                              </a>
+                            </Button>
+                            <Button variant="outline" size="sm" asChild>
+                              <a href="https://judiciary.go.ke" target="_blank" rel="noopener noreferrer">
+                                <Scale className="h-3 w-3 mr-1" />
+                                Judiciary of Kenya
+                                <ExternalLink className="h-3 w-3 ml-1" />
+                              </a>
+                            </Button>
+                          </div>
+                        </div>
                       </div>
                     </AccordionContent>
                   </AccordionItem>
