@@ -1,11 +1,13 @@
 import { NavLink } from "@/components/NavLink";
-import { Home, Users, MapPin, Info } from "lucide-react";
+import { Home, Search, Users, MapPin, Vote, BookOpen } from "lucide-react";
 
 const navItems = [
   { to: "/", label: "Home", icon: Home },
+  { to: "/search", label: "Search", icon: Search },
   { to: "/leaders", label: "Leaders", icon: Users },
   { to: "/counties", label: "Counties", icon: MapPin },
-  { to: "/about", label: "About", icon: Info },
+  { to: "/surveys", label: "Survey", icon: Vote },
+  { to: "/civic-facts", label: "CivicFacts", icon: BookOpen },
 ];
 
 export function Header() {
@@ -18,17 +20,17 @@ export function Header() {
             <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary">
               <span className="text-xl font-bold text-primary-foreground">CL</span>
             </div>
-            <span className="text-xl font-bold text-foreground">CivicLens</span>
+            <span className="text-xl font-bold text-foreground hidden sm:block">CivicLens</span>
           </NavLink>
 
           {/* Navigation */}
-          <nav className="hidden md:flex items-center gap-1">
+          <nav className="hidden lg:flex items-center gap-1">
             {navItems.map((item) => (
               <NavLink
                 key={item.to}
                 to={item.to}
                 end={item.to === "/"}
-                className="flex items-center gap-2 px-4 py-2 rounded-lg text-muted-foreground transition-colors hover:text-foreground hover:bg-muted"
+                className="flex items-center gap-2 px-3 py-2 rounded-lg text-muted-foreground transition-colors hover:text-foreground hover:bg-muted text-sm"
                 activeClassName="bg-primary/10 text-primary"
               >
                 <item.icon className="h-4 w-4" />
@@ -38,7 +40,7 @@ export function Header() {
           </nav>
 
           {/* Mobile Navigation */}
-          <nav className="flex md:hidden items-center gap-1">
+          <nav className="flex lg:hidden items-center gap-0.5">
             {navItems.map((item) => (
               <NavLink
                 key={item.to}

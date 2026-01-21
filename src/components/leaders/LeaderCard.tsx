@@ -7,15 +7,40 @@ import { MapPin, User } from "lucide-react";
 interface LeaderCardProps {
   leader: Leader;
   onClick?: () => void;
+  compact?: boolean;
 }
 
-export function LeaderCard({ leader, onClick }: LeaderCardProps) {
+export function LeaderCard({ leader, onClick, compact }: LeaderCardProps) {
   const initials = leader.name
     .split(" ")
     .map((n) => n[0])
     .join("")
     .slice(0, 2)
     .toUpperCase();
+
+  if (compact) {
+    return (
+      <div
+        className="group cursor-pointer p-3 rounded-lg bg-muted/30 hover:bg-muted transition-colors"
+        onClick={onClick}
+      >
+        <div className="flex items-center gap-3">
+          <Avatar className="h-10 w-10 border-2 border-background">
+            <AvatarImage src={leader.photo_url || undefined} alt={leader.name} />
+            <AvatarFallback className="bg-primary text-primary-foreground text-sm font-bold">
+              {initials}
+            </AvatarFallback>
+          </Avatar>
+          <div className="min-w-0 flex-1">
+            <h4 className="font-medium text-sm text-foreground truncate group-hover:text-primary transition-colors">
+              {leader.name}
+            </h4>
+            <p className="text-xs text-muted-foreground truncate">{leader.position}</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <Card
