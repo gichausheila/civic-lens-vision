@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -15,7 +16,9 @@ import {
   Loader2, 
   Globe,
   AlertCircle,
-  RefreshCw
+  RefreshCw,
+  ImageIcon,
+  ImageOff
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -41,6 +44,17 @@ interface ScrapingResponse {
   error?: string;
 }
 
+interface ScrapingResponse {
+  success: boolean;
+  dryRun: boolean;
+  processed: number;
+  found: number;
+  notFound: number;
+  results: ScrapingResult[];
+  message?: string;
+  error?: string;
+}
+
 export function BatchPhotoScraper() {
   const [isRunning, setIsRunning] = useState(false);
   const [dryRun, setDryRun] = useState(true);
@@ -49,6 +63,42 @@ export function BatchPhotoScraper() {
   const [migrateExisting, setMigrateExisting] = useState(true);
   const [results, setResults] = useState<ScrapingResult[]>([]);
   const [summary, setSummary] = useState<{ processed: number; found: number; notFound: number } | null>(null);
+
+  // Fetch photo coverage stats
+  const { data: photoStats, refetch: refetchStats } = useQuery({
+    queryKey: ["leader-photo-stats"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("leaders")
+        .select("id, photo_url, is_national");
+
+      if (error) throw error;
+
+      const total = data?.length || 0;
+      const withPhotos = data?.filter(l => l.photo_url && l.photo_url.trim() !== "").length || 0;
+      const withoutPhotos = total - withPhotos;
+      const nationalTotal = data?.filter(l => l.is_national).length || 0;
+      const nationalWithPhotos = data?.filter(l => l.is_national && l.photo_url && l.photo_url.trim() !== "").length || 0;
+      const externalUrls = data?.filter(l => 
+        l.photo_url && (
+          l.photo_url.includes("nation.africa") || 
+          l.photo_url.includes("tuko.co.ke") ||
+          l.photo_url.includes("standardmedia.co.ke")
+        )
+      ).length || 0;
+
+      return {
+        total,
+        withPhotos,
+        withoutPhotos,
+        coverage: total > 0 ? Math.round((withPhotos / total) * 100) : 0,
+        nationalTotal,
+        nationalWithPhotos,
+        nationalCoverage: nationalTotal > 0 ? Math.round((nationalWithPhotos / nationalTotal) * 100) : 0,
+        externalUrls
+      };
+    },
+  });
 
   const runScraper = async () => {
     setIsRunning(true);
@@ -87,6 +137,8 @@ export function BatchPhotoScraper() {
           toast.success(`Dry run complete! Would find ${response.found} photos for ${response.processed} leaders`);
         } else {
           toast.success(`Successfully scraped ${response.found} photos for ${response.processed} leaders`);
+          // Refresh stats after successful scrape
+          refetchStats();
         }
       } else {
         throw new Error(response.error || "Unknown error");
@@ -121,6 +173,45 @@ export function BatchPhotoScraper() {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
+        {/* Photo Coverage Stats */}
+        {photoStats && (
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <Card className="p-4 bg-muted/30">
+              <div className="flex items-center gap-2 mb-1">
+                <ImageIcon className="h-4 w-4 text-primary" />
+                <span className="text-sm text-muted-foreground">With Photos</span>
+              </div>
+              <div className="text-2xl font-bold">{photoStats.withPhotos}</div>
+              <Progress value={photoStats.coverage} className="h-1.5 mt-2" />
+              <span className="text-xs text-muted-foreground">{photoStats.coverage}% coverage</span>
+            </Card>
+            <Card className="p-4 bg-muted/30">
+              <div className="flex items-center gap-2 mb-1">
+                <ImageOff className="h-4 w-4 text-destructive" />
+                <span className="text-sm text-muted-foreground">Missing Photos</span>
+              </div>
+              <div className="text-2xl font-bold text-destructive">{photoStats.withoutPhotos}</div>
+              <p className="text-xs text-muted-foreground mt-2">of {photoStats.total} total leaders</p>
+            </Card>
+            <Card className="p-4 bg-muted/30">
+              <div className="flex items-center gap-2 mb-1">
+                <Badge variant="default" className="text-xs">National</Badge>
+              </div>
+              <div className="text-2xl font-bold">{photoStats.nationalWithPhotos}/{photoStats.nationalTotal}</div>
+              <Progress value={photoStats.nationalCoverage} className="h-1.5 mt-2" />
+              <span className="text-xs text-muted-foreground">{photoStats.nationalCoverage}% national coverage</span>
+            </Card>
+            <Card className="p-4 bg-muted/30">
+              <div className="flex items-center gap-2 mb-1">
+                <Globe className="h-4 w-4 text-accent-foreground" />
+                <span className="text-sm text-muted-foreground">External URLs</span>
+              </div>
+              <div className="text-2xl font-bold">{photoStats.externalUrls}</div>
+              <p className="text-xs text-muted-foreground mt-2">need migration to storage</p>
+            </Card>
+          </div>
+        )}
+
         {/* Configuration */}
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <div className="space-y-2">
