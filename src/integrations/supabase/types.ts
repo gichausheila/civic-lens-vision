@@ -137,6 +137,7 @@ export type Database = {
           name: string
           official_documents: Json | null
           party: string | null
+          photo_source: string | null
           photo_url: string | null
           position: string
           updated_at: string
@@ -161,6 +162,7 @@ export type Database = {
           name: string
           official_documents?: Json | null
           party?: string | null
+          photo_source?: string | null
           photo_url?: string | null
           position: string
           updated_at?: string
@@ -185,6 +187,7 @@ export type Database = {
           name?: string
           official_documents?: Json | null
           party?: string | null
+          photo_source?: string | null
           photo_url?: string | null
           position?: string
           updated_at?: string

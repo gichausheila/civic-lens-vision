@@ -30,6 +30,7 @@ export interface Leader {
   county_id: string | null;
   party: string | null;
   photo_url: string | null;
+  photo_source: string | null;
   bio: string | null;
   // Legacy manifesto field
   manifesto: ManifestoItem[];

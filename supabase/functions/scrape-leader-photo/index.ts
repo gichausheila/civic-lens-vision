@@ -5,13 +5,25 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+// Supported news sources for leader photos
+const NEWS_SOURCES = [
+  { name: 'Nation Africa', domain: 'nation.africa', searchPrefix: 'site:nation.africa' },
+  { name: 'Tuko Kenya', domain: 'tuko.co.ke', searchPrefix: 'site:tuko.co.ke' },
+];
+
+interface PhotoResult {
+  photoUrl: string;
+  sourceUrl: string;
+  sourceName: string;
+}
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { leaderId, leaderName, dryRun = false } = await req.json();
+    const { leaderId, leaderName, dryRun = false, preferredSource } = await req.json();
 
     if (!leaderId || !leaderName) {
       return new Response(
@@ -35,117 +47,131 @@ Deno.serve(async (req) => {
       .replace(/^Prof\.\s*/i, '')
       .trim();
 
-    console.log(`Searching Nation Africa for: ${cleanName}`);
+    console.log(`Searching for: ${cleanName}`);
 
-    // Search Nation Africa for the leader
-    const searchQuery = `site:nation.africa "${cleanName}" Kenya politician`;
-    
-    const searchResponse = await fetch('https://api.firecrawl.dev/v1/search', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        query: searchQuery,
-        limit: 5,
-      }),
-    });
-
-    const searchData = await searchResponse.json();
-
-    if (!searchResponse.ok) {
-      console.error('Firecrawl search error:', searchData);
-      return new Response(
-        JSON.stringify({ success: false, error: searchData.error || 'Search failed' }),
-        { status: searchResponse.status, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+    // Determine which sources to try
+    let sourcesToTry = NEWS_SOURCES;
+    if (preferredSource) {
+      const preferred = NEWS_SOURCES.find(s => s.name.toLowerCase().includes(preferredSource.toLowerCase()));
+      if (preferred) {
+        sourcesToTry = [preferred, ...NEWS_SOURCES.filter(s => s !== preferred)];
+      }
     }
 
-    const results = searchData.data || [];
-    console.log(`Found ${results.length} search results`);
+    let result: PhotoResult | null = null;
 
-    if (results.length === 0) {
-      return new Response(
-        JSON.stringify({ 
-          success: true, 
-          found: false, 
-          message: `No results found for ${cleanName}` 
-        }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
-
-    // Try to scrape the first relevant result for an image
-    let photoUrl: string | null = null;
-
-    for (const result of results) {
-      const url = result.url;
-      if (!url || !url.includes('nation.africa')) continue;
-
-      console.log(`Scraping: ${url}`);
-
-      const scrapeResponse = await fetch('https://api.firecrawl.dev/v1/scrape', {
+    // Try each source until we find a photo
+    for (const source of sourcesToTry) {
+      console.log(`Trying ${source.name}...`);
+      
+      const searchQuery = `${source.searchPrefix} "${cleanName}" Kenya`;
+      
+      const searchResponse = await fetch('https://api.firecrawl.dev/v1/search', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${apiKey}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          url,
-          formats: ['markdown', 'links'],
-          onlyMainContent: true,
+          query: searchQuery,
+          limit: 5,
         }),
       });
 
-      const scrapeData = await scrapeResponse.json();
+      const searchData = await searchResponse.json();
 
-      if (!scrapeResponse.ok) {
-        console.error('Scrape error:', scrapeData);
+      if (!searchResponse.ok) {
+        console.error(`${source.name} search error:`, searchData);
         continue;
       }
 
-      const markdown = scrapeData.data?.markdown || scrapeData.markdown || '';
-      const metadata = scrapeData.data?.metadata || scrapeData.metadata || {};
+      const results = searchData.data || [];
+      console.log(`${source.name}: Found ${results.length} search results`);
 
-      // Look for OG image or article image
-      if (metadata.ogImage) {
-        photoUrl = metadata.ogImage;
-        console.log(`Found OG image: ${photoUrl}`);
-        break;
-      }
+      if (results.length === 0) continue;
 
-      // Extract image URLs from markdown
-      const imageMatches = markdown.match(/!\[.*?\]\((https?:\/\/[^\s)]+)\)/g);
-      if (imageMatches) {
-        for (const match of imageMatches) {
-          const urlMatch = match.match(/\((https?:\/\/[^\s)]+)\)/);
-          if (urlMatch) {
-            const imgUrl = urlMatch[1];
-            // Filter for likely portrait photos (avoid logos, ads, etc.)
-            if (imgUrl.includes('nation.africa') && 
-                !imgUrl.includes('logo') && 
-                !imgUrl.includes('icon') &&
-                !imgUrl.includes('banner') &&
-                (imgUrl.includes('.jpg') || imgUrl.includes('.jpeg') || imgUrl.includes('.png') || imgUrl.includes('.webp'))) {
-              photoUrl = imgUrl;
-              console.log(`Found image from markdown: ${photoUrl}`);
-              break;
+      // Try to scrape each result for an image
+      for (const searchResult of results) {
+        const url = searchResult.url;
+        if (!url || !url.includes(source.domain)) continue;
+
+        console.log(`Scraping: ${url}`);
+
+        const scrapeResponse = await fetch('https://api.firecrawl.dev/v1/scrape', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${apiKey}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            url,
+            formats: ['markdown'],
+            onlyMainContent: true,
+          }),
+        });
+
+        const scrapeData = await scrapeResponse.json();
+
+        if (!scrapeResponse.ok) {
+          console.error('Scrape error:', scrapeData);
+          continue;
+        }
+
+        const markdown = scrapeData.data?.markdown || scrapeData.markdown || '';
+        const metadata = scrapeData.data?.metadata || scrapeData.metadata || {};
+
+        let photoUrl: string | null = null;
+
+        // Look for OG image or article image
+        if (metadata.ogImage && !metadata.ogImage.includes('logo') && !metadata.ogImage.includes('fallback')) {
+          photoUrl = metadata.ogImage;
+          console.log(`Found OG image: ${photoUrl}`);
+        }
+
+        // Extract image URLs from markdown if no OG image
+        if (!photoUrl) {
+          const imageMatches = markdown.match(/!\[.*?\]\((https?:\/\/[^\s)]+)\)/g);
+          if (imageMatches) {
+            for (const match of imageMatches) {
+              const urlMatch = match.match(/\((https?:\/\/[^\s)]+)\)/);
+              if (urlMatch) {
+                const imgUrl = urlMatch[1];
+                // Filter for likely portrait photos (avoid logos, ads, etc.)
+                if (!imgUrl.includes('logo') && 
+                    !imgUrl.includes('icon') &&
+                    !imgUrl.includes('banner') &&
+                    !imgUrl.includes('fallback') &&
+                    !imgUrl.includes('placeholder') &&
+                    (imgUrl.includes('.jpg') || imgUrl.includes('.jpeg') || imgUrl.includes('.png') || imgUrl.includes('.webp'))) {
+                  photoUrl = imgUrl;
+                  console.log(`Found image from markdown: ${photoUrl}`);
+                  break;
+                }
+              }
             }
           }
         }
+
+        if (photoUrl && !photoUrl.includes('fallback')) {
+          result = {
+            photoUrl,
+            sourceUrl: url,
+            sourceName: source.name
+          };
+          break;
+        }
       }
 
-      if (photoUrl) break;
+      if (result) break;
     }
 
-    if (!photoUrl) {
+    if (!result) {
       return new Response(
         JSON.stringify({ 
           success: true, 
           found: false, 
           message: `No suitable photo found for ${cleanName}`,
-          searchResults: results.length
+          searchedSources: sourcesToTry.map(s => s.name)
         }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
@@ -157,9 +183,11 @@ Deno.serve(async (req) => {
         JSON.stringify({ 
           success: true, 
           found: true, 
-          photoUrl,
+          photoUrl: result.photoUrl,
+          sourceUrl: result.sourceUrl,
+          sourceName: result.sourceName,
           dryRun: true,
-          message: `Would update ${cleanName} with photo` 
+          message: `Would update ${cleanName} with photo from ${result.sourceName}` 
         }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
@@ -172,7 +200,10 @@ Deno.serve(async (req) => {
 
     const { error: updateError } = await supabase
       .from('leaders')
-      .update({ photo_url: photoUrl })
+      .update({ 
+        photo_url: result.photoUrl,
+        photo_source: result.sourceUrl
+      })
       .eq('id', leaderId);
 
     if (updateError) {
@@ -183,14 +214,16 @@ Deno.serve(async (req) => {
       );
     }
 
-    console.log(`Successfully updated ${cleanName} with photo: ${photoUrl}`);
+    console.log(`Successfully updated ${cleanName} with photo from ${result.sourceName}: ${result.photoUrl}`);
 
     return new Response(
       JSON.stringify({ 
         success: true, 
         found: true, 
-        photoUrl,
-        message: `Updated ${cleanName} with photo` 
+        photoUrl: result.photoUrl,
+        sourceUrl: result.sourceUrl,
+        sourceName: result.sourceName,
+        message: `Updated ${cleanName} with photo from ${result.sourceName}` 
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );

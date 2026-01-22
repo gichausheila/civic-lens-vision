@@ -81,11 +81,23 @@ const LeaderProfile = () => {
             {/* Photo */}
             <div className="flex-shrink-0">
               {leader.photo_url ? (
-                <img 
-                  src={leader.photo_url} 
-                  alt={leader.name}
-                  className="h-32 w-32 rounded-xl object-cover"
-                />
+                <div className="relative group">
+                  <img 
+                    src={leader.photo_url} 
+                    alt={leader.name}
+                    className="h-32 w-32 rounded-xl object-cover"
+                  />
+                  {leader.photo_source && (
+                    <a
+                      href={leader.photo_source}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="absolute bottom-0 left-0 right-0 bg-black/70 text-white text-[10px] text-center py-0.5 rounded-b-xl opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      Photo source ↗
+                    </a>
+                  )}
+                </div>
               ) : (
                 <div className="h-32 w-32 rounded-xl bg-primary text-primary-foreground flex items-center justify-center text-3xl font-bold">
                   {initials}
