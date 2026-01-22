@@ -7,6 +7,7 @@ import { Separator } from "@/components/ui/separator";
 import { ArrowLeft, MapPin, Calendar, CheckCircle2, AlertTriangle, Award, Scale } from "lucide-react";
 import { LeaderFeedback } from "@/components/feedback/LeaderFeedback";
 import { ManifestoSection } from "@/components/leaders/ManifestoSection";
+import { ParliamentaryActivity } from "@/components/leaders/ParliamentaryActivity";
 
 // Placeholder performance actions
 const placeholderPerformance = [
@@ -157,7 +158,10 @@ const LeaderProfile = () => {
         </Card>
       </div>
 
-      {/* Section D: Legal & Integrity Information */}
+      {/* Section D: Parliamentary Activity (for MPs/Senators) */}
+      <ParliamentaryActivity leader={leader} />
+
+      {/* Section E: Legal & Integrity Information */}
       <Card className="mt-6">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">

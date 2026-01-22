@@ -4,7 +4,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { BookOpen, Scale, FileText, Search, ExternalLink, Calendar, Building } from "lucide-react";
+import { BookOpen, Scale, FileText, Search, ExternalLink, Calendar, Building, UserCheck } from "lucide-react";
+import { TrackYourMP } from "@/components/civicfacts/TrackYourMP";
 
 // Placeholder data for laws, bills, and constitutional documents
 const constitutionChapters = [
@@ -54,7 +55,7 @@ const importantDocuments = [
 
 export default function CivicFacts() {
   const [searchTerm, setSearchTerm] = useState("");
-  const [activeTab, setActiveTab] = useState("constitution");
+  const [activeTab, setActiveTab] = useState("track-mp");
 
   const filteredChapters = constitutionChapters.filter(
     (c) => c.title.toLowerCase().includes(searchTerm.toLowerCase()) || c.chapter.toLowerCase().includes(searchTerm.toLowerCase())
@@ -93,6 +94,10 @@ export default function CivicFacts() {
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="mb-6 flex-wrap h-auto gap-1">
+          <TabsTrigger value="track-mp" className="gap-2">
+            <UserCheck className="h-4 w-4" />
+            Track Your MP
+          </TabsTrigger>
           <TabsTrigger value="constitution" className="gap-2">
             <Scale className="h-4 w-4" />
             Constitution
@@ -110,6 +115,11 @@ export default function CivicFacts() {
             Documents
           </TabsTrigger>
         </TabsList>
+
+        {/* Track Your MP Tab */}
+        <TabsContent value="track-mp">
+          <TrackYourMP />
+        </TabsContent>
 
         {/* Constitution Tab */}
         <TabsContent value="constitution">
