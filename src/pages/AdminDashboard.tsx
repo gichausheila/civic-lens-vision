@@ -24,6 +24,7 @@ import { Shield, MessageSquare, MoreHorizontal, Trash2, CheckCircle, Clock, XCir
 import { useAuth, useIsAdmin, useSignOut } from "@/hooks/useAuth";
 import { useAdminFeedback, useUpdateFeedbackStatus, useDeleteFeedback } from "@/hooks/useFeedback";
 import { LeaderPhotoManager } from "@/components/admin/LeaderPhotoManager";
+import { BatchPhotoScraper } from "@/components/admin/BatchPhotoScraper";
 import { toast } from "sonner";
 import { format } from "date-fns";
 
@@ -265,7 +266,8 @@ export default function AdminDashboard() {
             </Card>
           </TabsContent>
 
-          <TabsContent value="photos">
+          <TabsContent value="photos" className="space-y-6">
+            <BatchPhotoScraper />
             <LeaderPhotoManager />
           </TabsContent>
         </Tabs>
