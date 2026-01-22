@@ -5,6 +5,59 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+// Helper function to download image and upload to Supabase Storage
+async function downloadAndUploadImage(
+  supabase: any,
+  imageUrl: string,
+  leaderId: string
+): Promise<string | null> {
+  try {
+    // Download the image
+    const response = await fetch(imageUrl, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (compatible; CivicLens/1.0)',
+        'Accept': 'image/*',
+      },
+    });
+
+    if (!response.ok) {
+      console.log(`Failed to download image: ${response.status}`);
+      return null;
+    }
+
+    const contentType = response.headers.get('content-type') || 'image/jpeg';
+    const extension = contentType.includes('png') ? 'png' : 
+                     contentType.includes('webp') ? 'webp' : 'jpg';
+    
+    const arrayBuffer = await response.arrayBuffer();
+    const blob = new Blob([arrayBuffer], { type: contentType });
+
+    // Upload to Supabase Storage
+    const fileName = `${leaderId}.${extension}`;
+    const { error: uploadError } = await supabase.storage
+      .from('leader-photos')
+      .upload(fileName, blob, {
+        contentType,
+        upsert: true,
+      });
+
+    if (uploadError) {
+      console.error(`Upload error:`, uploadError);
+      return null;
+    }
+
+    // Get public URL
+    const { data: urlData } = supabase.storage
+      .from('leader-photos')
+      .getPublicUrl(fileName);
+
+    return urlData.publicUrl;
+  } catch (err) {
+    console.error(`Error downloading/uploading image:`, err);
+    return null;
+  }
+}
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -25,11 +78,11 @@ Deno.serve(async (req) => {
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // Get leaders without photos
+    // Get leaders without photos or with external photo URLs that need migration
     let query = supabase
       .from('leaders')
-      .select('id, name, position, is_national')
-      .or('photo_url.is.null,photo_url.eq.')
+      .select('id, name, position, is_national, photo_url, photo_source')
+      .or('photo_url.is.null,photo_url.eq.,photo_url.ilike.%nation.africa%,photo_url.ilike.%tuko.co.ke%')
       .limit(limit);
 
     if (prioritizeNational) {
@@ -54,20 +107,55 @@ Deno.serve(async (req) => {
       );
     }
 
-    console.log(`Processing ${leaders.length} leaders without photos`);
+    console.log(`Processing ${leaders.length} leaders`);
 
     const results: Array<{
       name: string;
       position: string;
       found: boolean;
       photoUrl?: string;
+      sourceUrl?: string;
       error?: string;
     }> = [];
 
     let successCount = 0;
     let failCount = 0;
 
+    const NEWS_SOURCES = [
+      { name: 'Nation Africa', domain: 'nation.africa', searchPrefix: 'site:nation.africa' },
+      { name: 'Tuko Kenya', domain: 'tuko.co.ke', searchPrefix: 'site:tuko.co.ke' },
+    ];
+
     for (const leader of leaders) {
+      // If leader already has a photo URL that needs migration to storage
+      if (leader.photo_url && (leader.photo_url.includes('nation.africa') || leader.photo_url.includes('tuko.co.ke'))) {
+        console.log(`Migrating existing photo for ${leader.name}`);
+        
+        if (!dryRun) {
+          const storedUrl = await downloadAndUploadImage(supabase, leader.photo_url, leader.id);
+          if (storedUrl) {
+            const { error: updateError } = await supabase
+              .from('leaders')
+              .update({ 
+                photo_url: storedUrl,
+                photo_source: leader.photo_source || leader.photo_url
+              })
+              .eq('id', leader.id);
+
+            if (!updateError) {
+              results.push({ name: leader.name, position: leader.position, found: true, photoUrl: storedUrl, sourceUrl: leader.photo_url });
+              successCount++;
+              console.log(`✓ Migrated photo for ${leader.name}`);
+              continue;
+            }
+          }
+        } else {
+          results.push({ name: leader.name, position: leader.position, found: true, photoUrl: '(would migrate)', sourceUrl: leader.photo_url });
+          successCount++;
+          continue;
+        }
+      }
+
       // Clean up the name for search
       const cleanName = leader.name
         .replace(/^Hon\.\s*/i, '')
@@ -75,126 +163,131 @@ Deno.serve(async (req) => {
         .replace(/^Prof\.\s*/i, '')
         .trim();
 
-      console.log(`Processing: ${cleanName} (${leader.position})`);
+      console.log(`Searching for: ${cleanName} (${leader.position})`);
 
-      try {
-        // Search Nation Africa for the leader
-        const searchQuery = `site:nation.africa "${cleanName}" Kenya`;
-        
-        const searchResponse = await fetch('https://api.firecrawl.dev/v1/search', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${apiKey}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            query: searchQuery,
-            limit: 3,
-          }),
-        });
+      let foundPhoto = false;
 
-        const searchData = await searchResponse.json();
+      for (const source of NEWS_SOURCES) {
+        if (foundPhoto) break;
 
-        if (!searchResponse.ok) {
-          results.push({ name: leader.name, position: leader.position, found: false, error: 'Search failed' });
-          failCount++;
-          continue;
-        }
-
-        const searchResults = searchData.data || [];
-
-        if (searchResults.length === 0) {
-          results.push({ name: leader.name, position: leader.position, found: false, error: 'No results' });
-          failCount++;
-          continue;
-        }
-
-        // Try to get photo from first result
-        let photoUrl: string | null = null;
-        
-        for (const result of searchResults) {
-          const url = result.url;
-          if (!url || !url.includes('nation.africa')) continue;
-
-          const scrapeResponse = await fetch('https://api.firecrawl.dev/v1/scrape', {
+        try {
+          const searchQuery = `${source.searchPrefix} "${cleanName}" Kenya`;
+          
+          const searchResponse = await fetch('https://api.firecrawl.dev/v1/search', {
             method: 'POST',
             headers: {
               'Authorization': `Bearer ${apiKey}`,
               'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-              url,
-              formats: ['markdown'],
-              onlyMainContent: true,
+              query: searchQuery,
+              limit: 3,
             }),
           });
 
-          const scrapeData = await scrapeResponse.json();
-          if (!scrapeResponse.ok) continue;
+          const searchData = await searchResponse.json();
 
-          const metadata = scrapeData.data?.metadata || scrapeData.metadata || {};
-          const markdown = scrapeData.data?.markdown || scrapeData.markdown || '';
+          if (!searchResponse.ok) continue;
 
-          // Check OG image first
-          if (metadata.ogImage && metadata.ogImage.includes('nation')) {
-            photoUrl = metadata.ogImage;
-            break;
-          }
+          const searchResults = searchData.data || [];
+          if (searchResults.length === 0) continue;
 
-          // Extract from markdown
-          const imageMatches = markdown.match(/!\[.*?\]\((https?:\/\/[^\s)]+)\)/g);
-          if (imageMatches) {
-            for (const match of imageMatches) {
-              const urlMatch = match.match(/\((https?:\/\/[^\s)]+)\)/);
-              if (urlMatch) {
-                const imgUrl = urlMatch[1];
-                if (imgUrl.includes('nation') && 
-                    !imgUrl.includes('logo') && 
-                    !imgUrl.includes('icon') &&
-                    (imgUrl.endsWith('.jpg') || imgUrl.endsWith('.jpeg') || imgUrl.endsWith('.png') || imgUrl.endsWith('.webp') ||
-                     imgUrl.includes('.jpg') || imgUrl.includes('.jpeg') || imgUrl.includes('.png'))) {
-                  photoUrl = imgUrl;
-                  break;
+          for (const result of searchResults) {
+            const url = result.url;
+            if (!url || !url.includes(source.domain)) continue;
+
+            const scrapeResponse = await fetch('https://api.firecrawl.dev/v1/scrape', {
+              method: 'POST',
+              headers: {
+                'Authorization': `Bearer ${apiKey}`,
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                url,
+                formats: ['markdown'],
+                onlyMainContent: true,
+              }),
+            });
+
+            const scrapeData = await scrapeResponse.json();
+            if (!scrapeResponse.ok) continue;
+
+            const metadata = scrapeData.data?.metadata || scrapeData.metadata || {};
+            const markdown = scrapeData.data?.markdown || scrapeData.markdown || '';
+
+            let photoUrl: string | null = null;
+
+            // Check OG image first
+            if (metadata.ogImage && metadata.ogImage.includes(source.domain)) {
+              photoUrl = metadata.ogImage;
+            }
+
+            // Extract from markdown if no OG image
+            if (!photoUrl) {
+              const imageMatches = markdown.match(/!\[.*?\]\((https?:\/\/[^\s)]+)\)/g);
+              if (imageMatches) {
+                for (const match of imageMatches) {
+                  const urlMatch = match.match(/\((https?:\/\/[^\s)]+)\)/);
+                  if (urlMatch) {
+                    const imgUrl = urlMatch[1];
+                    if (imgUrl.includes(source.domain) && 
+                        !imgUrl.includes('logo') && 
+                        !imgUrl.includes('icon') &&
+                        !imgUrl.includes('placeholder') &&
+                        (imgUrl.includes('.jpg') || imgUrl.includes('.jpeg') || imgUrl.includes('.png') || imgUrl.includes('.webp'))) {
+                      photoUrl = imgUrl;
+                      break;
+                    }
+                  }
                 }
               }
             }
+
+            if (photoUrl) {
+              if (!dryRun) {
+                // Download and upload to storage
+                const storedUrl = await downloadAndUploadImage(supabase, photoUrl, leader.id);
+                
+                if (storedUrl) {
+                  const { error: updateError } = await supabase
+                    .from('leaders')
+                    .update({ 
+                      photo_url: storedUrl,
+                      photo_source: url  // Store the article URL as source
+                    })
+                    .eq('id', leader.id);
+
+                  if (!updateError) {
+                    results.push({ name: leader.name, position: leader.position, found: true, photoUrl: storedUrl, sourceUrl: url });
+                    successCount++;
+                    foundPhoto = true;
+                    console.log(`✓ Found and uploaded photo for ${cleanName} from ${source.name}`);
+                    break;
+                  }
+                }
+              } else {
+                results.push({ name: leader.name, position: leader.position, found: true, photoUrl: '(dry run)', sourceUrl: url });
+                successCount++;
+                foundPhoto = true;
+                break;
+              }
+            }
           }
-
-          if (photoUrl) break;
+        } catch (err) {
+          console.error(`Error searching ${source.name} for ${leader.name}:`, err);
         }
 
-        if (!photoUrl) {
-          results.push({ name: leader.name, position: leader.position, found: false, error: 'No photo found' });
-          failCount++;
-          continue;
-        }
+        // Small delay between sources
+        await new Promise(resolve => setTimeout(resolve, 300));
+      }
 
-        // Update database if not dry run
-        if (!dryRun) {
-          const { error: updateError } = await supabase
-            .from('leaders')
-            .update({ photo_url: photoUrl })
-            .eq('id', leader.id);
-
-          if (updateError) {
-            results.push({ name: leader.name, position: leader.position, found: true, photoUrl, error: 'DB update failed' });
-            failCount++;
-            continue;
-          }
-        }
-
-        results.push({ name: leader.name, position: leader.position, found: true, photoUrl });
-        successCount++;
-        console.log(`✓ Found photo for ${cleanName}`);
-
-        // Small delay to avoid rate limiting
-        await new Promise(resolve => setTimeout(resolve, 500));
-
-      } catch (err) {
-        console.error(`Error processing ${leader.name}:`, err);
-        results.push({ name: leader.name, position: leader.position, found: false, error: 'Processing error' });
+      if (!foundPhoto) {
+        results.push({ name: leader.name, position: leader.position, found: false, error: 'No photo found' });
         failCount++;
       }
+
+      // Delay between leaders
+      await new Promise(resolve => setTimeout(resolve, 500));
     }
 
     return new Response(

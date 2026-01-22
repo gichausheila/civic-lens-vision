@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -22,6 +23,7 @@ function isMP(position: string): boolean {
 }
 
 export function LeaderCard({ leader, onClick, compact }: LeaderCardProps) {
+  const [imageError, setImageError] = useState(false);
   const initials = leader.name
     .split(" ")
     .map((n) => n[0])
@@ -40,7 +42,11 @@ export function LeaderCard({ leader, onClick, compact }: LeaderCardProps) {
       >
         <div className="flex items-center gap-3">
           <Avatar className="h-10 w-10 flex-shrink-0 border-2 border-background">
-            <AvatarImage src={leader.photo_url || undefined} alt={leader.name} />
+            <AvatarImage 
+              src={imageError ? undefined : (leader.photo_url || undefined)} 
+              alt={leader.name}
+              onError={() => setImageError(true)}
+            />
             <AvatarFallback className="bg-primary text-primary-foreground text-sm font-bold">
               {initials}
             </AvatarFallback>
@@ -71,9 +77,10 @@ export function LeaderCard({ leader, onClick, compact }: LeaderCardProps) {
         <div className="relative aspect-square sm:aspect-[4/3] bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center overflow-hidden">
           <Avatar className="h-12 w-12 sm:h-20 md:h-28 border-2 sm:border-4 border-background shadow-md sm:shadow-lg transition-transform duration-300 group-hover:scale-105">
             <AvatarImage 
-              src={leader.photo_url || undefined} 
+              src={imageError ? undefined : (leader.photo_url || undefined)} 
               alt={leader.name}
               className="object-cover"
+              onError={() => setImageError(true)}
             />
             <AvatarFallback className="bg-primary text-primary-foreground text-xs sm:text-xl md:text-2xl font-bold">
               {initials}

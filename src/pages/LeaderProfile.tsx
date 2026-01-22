@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Layout } from "@/components/layout/Layout";
 import { useLeader } from "@/hooks/useLeaders";
@@ -8,7 +9,6 @@ import { ArrowLeft, MapPin, Calendar, CheckCircle2, AlertTriangle, Award, Scale 
 import { LeaderFeedback } from "@/components/feedback/LeaderFeedback";
 import { ManifestoSection } from "@/components/leaders/ManifestoSection";
 import { ParliamentaryActivity } from "@/components/leaders/ParliamentaryActivity";
-
 // Placeholder performance actions
 const placeholderPerformance = [
   { text: "Launched county health insurance program benefiting 50,000 households", date: "2023-08" },
@@ -26,6 +26,7 @@ const placeholderLegalInfo = [
 const LeaderProfile = () => {
   const { id } = useParams<{ id: string }>();
   const { data: leader, isLoading } = useLeader(id);
+  const [imageError, setImageError] = useState(false);
 
   if (isLoading) {
     return (
@@ -80,12 +81,13 @@ const LeaderProfile = () => {
           <div className="flex flex-col md:flex-row gap-6">
             {/* Photo */}
             <div className="flex-shrink-0">
-              {leader.photo_url ? (
+              {leader.photo_url && !imageError ? (
                 <div className="relative group">
                   <img 
                     src={leader.photo_url} 
                     alt={leader.name}
                     className="h-32 w-32 rounded-xl object-cover"
+                    onError={() => setImageError(true)}
                   />
                   {leader.photo_source && (
                     <a
