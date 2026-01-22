@@ -11,6 +11,7 @@ function transformImpeachedLeader(data: Record<string, unknown>): Leader {
     county_id: data.county_id as string | null,
     party: data.party as string | null,
     photo_url: data.photo_url as string | null,
+    photo_source: data.photo_source as string | null,
     bio: data.bio as string | null,
     manifesto: Array.isArray(data.manifesto) ? (data.manifesto as ManifestoItem[]) : [],
     manifesto_summary: (data.manifesto_summary as string) || null,
