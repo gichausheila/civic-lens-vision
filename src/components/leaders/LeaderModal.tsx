@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import {
   Dialog,
@@ -33,6 +34,7 @@ function isMP(position: string): boolean {
 }
 
 export function LeaderModal({ leader, open, onOpenChange }: LeaderModalProps) {
+  const [imageError, setImageError] = useState(false);
   if (!leader) return null;
 
   const initials = leader.name
@@ -55,7 +57,11 @@ export function LeaderModal({ leader, open, onOpenChange }: LeaderModalProps) {
         <DialogHeader>
           <div className="flex items-start gap-4">
             <Avatar className="h-20 w-20 border-4 border-primary/20">
-              <AvatarImage src={leader.photo_url || undefined} alt={leader.name} />
+              <AvatarImage 
+                src={imageError ? undefined : (leader.photo_url || undefined)} 
+                alt={leader.name}
+                onError={() => setImageError(true)}
+              />
               <AvatarFallback className="bg-primary text-primary-foreground text-2xl font-bold">
                 {initials}
               </AvatarFallback>

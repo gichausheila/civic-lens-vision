@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -11,6 +12,7 @@ interface NationalLeaderCardProps {
 }
 
 export function NationalLeaderCard({ leader, variant = "compact", onClick }: NationalLeaderCardProps) {
+  const [imageError, setImageError] = useState(false);
   const initials = leader.name
     .split(" ")
     .map((n) => n[0])
@@ -44,7 +46,11 @@ export function NationalLeaderCard({ leader, variant = "compact", onClick }: Nat
           <div className="flex flex-col items-center text-center">
             <div className="relative mb-4">
               <Avatar className="h-28 w-28 border-4 border-primary/20 group-hover:border-primary/40 transition-colors">
-                <AvatarImage src={leader.photo_url || undefined} alt={leader.name} />
+                <AvatarImage 
+                  src={imageError ? undefined : (leader.photo_url || undefined)} 
+                  alt={leader.name}
+                  onError={() => setImageError(true)}
+                />
                 <AvatarFallback className="text-2xl font-bold bg-primary/10 text-primary">
                   {initials}
                 </AvatarFallback>
@@ -84,7 +90,11 @@ export function NationalLeaderCard({ leader, variant = "compact", onClick }: Nat
       <CardContent className="p-4">
         <div className="flex items-start gap-3">
           <Avatar className="h-12 w-12 border-2 border-muted group-hover:border-primary/30 transition-colors shrink-0">
-            <AvatarImage src={leader.photo_url || undefined} alt={leader.name} />
+            <AvatarImage 
+              src={imageError ? undefined : (leader.photo_url || undefined)} 
+              alt={leader.name}
+              onError={() => setImageError(true)}
+            />
             <AvatarFallback className="text-sm font-semibold bg-muted text-muted-foreground">
               {initials}
             </AvatarFallback>
