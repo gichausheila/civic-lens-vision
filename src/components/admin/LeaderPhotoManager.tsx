@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,6 +7,16 @@ import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 import { Search, Upload, Camera, X, Loader2 } from "lucide-react";
 import type { Leader } from "@/types/database";
@@ -14,6 +24,9 @@ import type { Leader } from "@/types/database";
 export function LeaderPhotoManager() {
   const [searchTerm, setSearchTerm] = useState("");
   const [uploadingId, setUploadingId] = useState<string | null>(null);
+  const [removeCandidate, setRemoveCandidate] = useState<
+    Pick<Leader, "id" | "name"> | null
+  >(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const queryClient = useQueryClient();
 
@@ -23,10 +36,10 @@ export function LeaderPhotoManager() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("leaders")
-        .select("id, name, position, party, photo_url")
+        .select("id, name, position, party, photo_url, photo_source")
         .order("name");
       if (error) throw error;
-      return data as Pick<Leader, "id" | "name" | "position" | "party" | "photo_url">[];
+      return data as Pick<Leader, "id" | "name" | "position" | "party" | "photo_url" | "photo_source">[];
     },
   });
 
@@ -47,6 +60,25 @@ export function LeaderPhotoManager() {
     onError: (error) => {
       console.error("Update error:", error);
       toast.error("Failed to update photo");
+    },
+  });
+
+  const removePhotoMutation = useMutation({
+    mutationFn: async ({ leaderId }: { leaderId: string }) => {
+      const { error } = await supabase
+        .from("leaders")
+        .update({ photo_url: null, photo_source: null })
+        .eq("id", leaderId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-leaders"] });
+      queryClient.invalidateQueries({ queryKey: ["leaders"] });
+      toast.success("Photo removed");
+    },
+    onError: (error) => {
+      console.error("Remove photo error:", error);
+      toast.error("Failed to remove photo");
     },
   });
 
@@ -100,6 +132,12 @@ export function LeaderPhotoManager() {
     leader.position.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const leadersWithPhotos = useMemo(
+    () => leaders?.filter((l) => l.photo_url).length || 0,
+    [leaders]
+  );
+  const totalLeaders = leaders?.length || 0;
+
   const getInitials = (name: string) => {
     return name
       .split(" ")
@@ -108,9 +146,6 @@ export function LeaderPhotoManager() {
       .join("")
       .toUpperCase();
   };
-
-  const leadersWithPhotos = leaders?.filter((l) => l.photo_url).length || 0;
-  const totalLeaders = leaders?.length || 0;
 
   return (
     <Card>
@@ -138,6 +173,36 @@ export function LeaderPhotoManager() {
         </div>
       </CardHeader>
       <CardContent>
+        <AlertDialog
+          open={!!removeCandidate}
+          onOpenChange={(open) => {
+            if (!open) setRemoveCandidate(null);
+          }}
+        >
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Remove photo?</AlertDialogTitle>
+              <AlertDialogDescription>
+                This will remove the current photo for{` `}
+                <span className="font-medium">{removeCandidate?.name}</span>. You can upload a new one anytime.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel disabled={removePhotoMutation.isPending}>Cancel</AlertDialogCancel>
+              <AlertDialogAction
+                disabled={!removeCandidate || removePhotoMutation.isPending}
+                onClick={async () => {
+                  if (!removeCandidate) return;
+                  await removePhotoMutation.mutateAsync({ leaderId: removeCandidate.id });
+                  setRemoveCandidate(null);
+                }}
+              >
+                {removePhotoMutation.isPending ? "Removing…" : "Remove"}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+
         {isLoading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {Array.from({ length: 6 }).map((_, i) => (
@@ -164,7 +229,19 @@ export function LeaderPhotoManager() {
                     </Badge>
                   )}
                 </div>
-                <div>
+                <div className="flex items-center gap-1">
+                  {leader.photo_url ? (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      disabled={uploadingId === leader.id}
+                      onClick={() => setRemoveCandidate({ id: leader.id, name: leader.name })}
+                      aria-label={`Remove photo for ${leader.name}`}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  ) : null}
                   <input
                     type="file"
                     accept="image/*"
