@@ -9,13 +9,7 @@ import { ArrowLeft, MapPin, Calendar, CheckCircle2, AlertTriangle, Award, Scale 
 import { LeaderFeedback } from "@/components/feedback/LeaderFeedback";
 import { ManifestoSection } from "@/components/leaders/ManifestoSection";
 import { ParliamentaryActivity } from "@/components/leaders/ParliamentaryActivity";
-// Placeholder performance actions
-const placeholderPerformance = [
-  { text: "Launched county health insurance program benefiting 50,000 households", date: "2023-08" },
-  { text: "Completed construction of 3 new health centers", date: "2023-06" },
-  { text: "Initiated water pipeline project covering 15 wards", date: "2023-04" },
-  { text: "Disbursed education bursaries to 2,500 students", date: "2024-01" },
-];
+import { Clock } from "lucide-react";
 
 // Placeholder legal information
 const placeholderLegalInfo = [
@@ -60,9 +54,6 @@ const LeaderProfile = () => {
     .slice(0, 2)
     .toUpperCase();
 
-  const performance = leader.achievements?.length > 0 
-    ? leader.achievements 
-    : placeholderPerformance;
 
   return (
     <Layout>
@@ -155,19 +146,13 @@ const LeaderProfile = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <ul className="space-y-4">
-              {performance.map((item, index) => (
-                <li key={index} className="flex gap-3">
-                  <CheckCircle2 className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
-                  <div>
-                    <p className="text-sm">{item.text}</p>
-                    {item.date && (
-                      <p className="text-xs text-muted-foreground mt-1">{item.date}</p>
-                    )}
-                  </div>
-                </li>
-              ))}
-            </ul>
+            <div className="flex flex-col items-center justify-center py-8 text-center">
+              <Clock className="h-12 w-12 text-muted-foreground/50 mb-4" />
+              <h3 className="text-lg font-semibold text-foreground mb-2">Coming Soon</h3>
+              <p className="text-sm text-muted-foreground max-w-xs">
+                We're working on gathering verified performance data for this leader.
+              </p>
+            </div>
           </CardContent>
         </Card>
       </div>
