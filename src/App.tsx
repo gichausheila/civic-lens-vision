@@ -3,6 +3,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AdminGate } from "@/components/auth/AdminGate";
 import Index from "./pages/Index";
 import Search from "./pages/Search";
 import Leaders from "./pages/Leaders";
@@ -27,21 +28,26 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/search" element={<Search />} />
-          <Route path="/leaders" element={<Leaders />} />
-          <Route path="/leader/:id" element={<LeaderProfile />} />
-          <Route path="/impeached" element={<ImpeachedLeaders />} />
-          <Route path="/counties" element={<Counties />} />
-          <Route path="/surveys" element={<Surveys />} />
-          <Route path="/civic-facts" element={<CivicFacts />} />
-          <Route path="/feedback" element={<Feedback />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/privacy" element={<PrivacyPolicy />} />
           <Route path="/admin/login" element={<AdminLogin />} />
-          <Route path="/admin" element={<AdminDashboard />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
+          <Route path="*" element={
+            <AdminGate>
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/search" element={<Search />} />
+                <Route path="/leaders" element={<Leaders />} />
+                <Route path="/leader/:id" element={<LeaderProfile />} />
+                <Route path="/impeached" element={<ImpeachedLeaders />} />
+                <Route path="/counties" element={<Counties />} />
+                <Route path="/surveys" element={<Surveys />} />
+                <Route path="/civic-facts" element={<CivicFacts />} />
+                <Route path="/feedback" element={<Feedback />} />
+                <Route path="/about" element={<About />} />
+                <Route path="/privacy" element={<PrivacyPolicy />} />
+                <Route path="/admin" element={<AdminDashboard />} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </AdminGate>
+          } />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>
