@@ -5,7 +5,7 @@ import { useLeader } from "@/hooks/useLeaders";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { ArrowLeft, MapPin, Calendar, CheckCircle2, AlertTriangle, Award, Scale } from "lucide-react";
+import { ArrowLeft, MapPin, Calendar, CheckCircle2, AlertTriangle, Award, Scale, ExternalLink } from "lucide-react";
 import { LeaderFeedback } from "@/components/feedback/LeaderFeedback";
 import { ManifestoSection } from "@/components/leaders/ManifestoSection";
 import { ParliamentaryActivity } from "@/components/leaders/ParliamentaryActivity";
