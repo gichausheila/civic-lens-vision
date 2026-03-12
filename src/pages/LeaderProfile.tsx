@@ -135,6 +135,28 @@ const LeaderProfile = () => {
               {leader.bio && (
                 <p className="text-muted-foreground mt-4">{leader.bio}</p>
               )}
+
+              {/* Official Source Links */}
+              <div className="flex flex-wrap gap-3 mt-3 pt-3 border-t">
+                <a
+                  href={OFFICIAL_SOURCES.parliament}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 text-xs text-primary hover:underline"
+                >
+                  <ExternalLink className="h-3 w-3" />
+                  Parliament of Kenya
+                </a>
+                <a
+                  href={OFFICIAL_SOURCES.iebc}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 text-xs text-primary hover:underline"
+                >
+                  <ExternalLink className="h-3 w-3" />
+                  IEBC
+                </a>
+              </div>
             </div>
           </div>
         </CardContent>
