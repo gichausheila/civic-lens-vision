@@ -214,9 +214,18 @@ const LeaderProfile = () => {
           <Separator className="my-4" />
           
           <div className="p-4 rounded-lg bg-muted/30 border border-dashed">
-            <p className="text-xs text-muted-foreground italic">
+            <p className="text-xs text-muted-foreground italic mb-2">
               <strong>Disclaimer:</strong> Information shown here is based on publicly available records and is for informational purposes only. CivicLens does not make any claims about the legal status of any individual.
             </p>
+            <a
+              href={OFFICIAL_SOURCES.kenyaLaw}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 text-xs text-primary hover:underline"
+            >
+              <ExternalLink className="h-3 w-3" />
+              Verify on Kenya Law
+            </a>
           </div>
         </CardContent>
       </Card>
