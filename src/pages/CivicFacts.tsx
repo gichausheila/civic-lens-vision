@@ -8,6 +8,10 @@ import { BookOpen, Scale, FileText, Search, ExternalLink, Calendar, Building, Us
 import { TrackYourMP } from "@/components/civicfacts/TrackYourMP";
 
 // Placeholder data for laws, bills, and constitutional documents
+const KENYA_LAW_CONSTITUTION = "http://www.kenyalaw.org/lex/actview.xql?actid=Const2010";
+const KENYA_LAW_BASE = "http://www.kenyalaw.org";
+const PARLIAMENT_BILLS = "https://www.parliament.go.ke/the-national-assembly/house-business/bills";
+
 const constitutionChapters = [
   { id: "1", chapter: "Chapter 1", title: "Sovereignty of the People and Supremacy of the Constitution", articles: "1-3" },
   { id: "2", chapter: "Chapter 2", title: "The Republic", articles: "4-11" },
