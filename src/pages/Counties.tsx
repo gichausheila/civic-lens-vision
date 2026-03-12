@@ -64,6 +64,13 @@ const countyLandmarks: Record<number, { name: string; imageUrl: string; wikiUrl:
 // Fallback placeholder image
 const FALLBACK_IMAGE = "/placeholder.svg";
 
+// Official data sources
+const DATA_SOURCES = {
+  knbs: "https://www.knbs.or.ke/",
+  iebc: "https://www.iebc.or.ke/",
+  parliament: "https://www.parliament.go.ke/the-national-assembly/mps",
+} as const;
+
 const Counties = () => {
   const { data: counties, isLoading: loadingCounties } = useCounties();
   const { data: leaders } = useLeaders();
@@ -223,8 +230,27 @@ const Counties = () => {
         </DialogContent>
       </Dialog>
 
+      {/* Data Sources */}
+      <div className="mt-8 p-4 rounded-lg bg-muted/50 border">
+        <h3 className="text-sm font-semibold text-foreground mb-2">Data Sources</h3>
+        <div className="flex flex-wrap gap-4 text-xs text-muted-foreground">
+          <a href={DATA_SOURCES.knbs} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-primary hover:underline">
+            <ExternalLink className="h-3 w-3" />
+            Kenya National Bureau of Statistics (KNBS)
+          </a>
+          <a href={DATA_SOURCES.iebc} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-primary hover:underline">
+            <ExternalLink className="h-3 w-3" />
+            Independent Electoral & Boundaries Commission (IEBC)
+          </a>
+          <a href={DATA_SOURCES.parliament} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-primary hover:underline">
+            <ExternalLink className="h-3 w-3" />
+            Parliament of Kenya
+          </a>
+        </div>
+      </div>
+
       {/* Legal Disclaimer */}
-      <div className="text-center py-8 mt-8 border-t">
+      <div className="text-center py-8 mt-4 border-t">
         <h3 className="text-sm font-semibold text-foreground mb-2">Legal Disclaimer</h3>
         <div className="text-sm text-muted-foreground max-w-2xl mx-auto space-y-1">
           <p>CivicLens aggregates publicly available civic information for educational and awareness purposes only.</p>

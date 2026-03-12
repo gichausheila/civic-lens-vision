@@ -5,11 +5,18 @@ import { useLeader } from "@/hooks/useLeaders";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { ArrowLeft, MapPin, Calendar, CheckCircle2, AlertTriangle, Award, Scale } from "lucide-react";
+import { ArrowLeft, MapPin, Calendar, CheckCircle2, AlertTriangle, Award, Scale, ExternalLink } from "lucide-react";
 import { LeaderFeedback } from "@/components/feedback/LeaderFeedback";
 import { ManifestoSection } from "@/components/leaders/ManifestoSection";
 import { ParliamentaryActivity } from "@/components/leaders/ParliamentaryActivity";
 import { Clock } from "lucide-react";
+
+// Official source URLs
+const OFFICIAL_SOURCES = {
+  parliament: "https://www.parliament.go.ke/the-national-assembly/mps",
+  iebc: "https://www.iebc.or.ke/",
+  kenyaLaw: "http://www.kenyalaw.org",
+} as const;
 
 // Placeholder legal information
 const placeholderLegalInfo = [
@@ -128,6 +135,28 @@ const LeaderProfile = () => {
               {leader.bio && (
                 <p className="text-muted-foreground mt-4">{leader.bio}</p>
               )}
+
+              {/* Official Source Links */}
+              <div className="flex flex-wrap gap-3 mt-3 pt-3 border-t">
+                <a
+                  href={OFFICIAL_SOURCES.parliament}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 text-xs text-primary hover:underline"
+                >
+                  <ExternalLink className="h-3 w-3" />
+                  Parliament of Kenya
+                </a>
+                <a
+                  href={OFFICIAL_SOURCES.iebc}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 text-xs text-primary hover:underline"
+                >
+                  <ExternalLink className="h-3 w-3" />
+                  IEBC
+                </a>
+              </div>
             </div>
           </div>
         </CardContent>
@@ -185,9 +214,18 @@ const LeaderProfile = () => {
           <Separator className="my-4" />
           
           <div className="p-4 rounded-lg bg-muted/30 border border-dashed">
-            <p className="text-xs text-muted-foreground italic">
+            <p className="text-xs text-muted-foreground italic mb-2">
               <strong>Disclaimer:</strong> Information shown here is based on publicly available records and is for informational purposes only. CivicLens does not make any claims about the legal status of any individual.
             </p>
+            <a
+              href={OFFICIAL_SOURCES.kenyaLaw}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 text-xs text-primary hover:underline"
+            >
+              <ExternalLink className="h-3 w-3" />
+              Verify on Kenya Law
+            </a>
           </div>
         </CardContent>
       </Card>

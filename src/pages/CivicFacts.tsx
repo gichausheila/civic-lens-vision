@@ -8,6 +8,10 @@ import { BookOpen, Scale, FileText, Search, ExternalLink, Calendar, Building, Us
 import { TrackYourMP } from "@/components/civicfacts/TrackYourMP";
 
 // Placeholder data for laws, bills, and constitutional documents
+const KENYA_LAW_CONSTITUTION = "http://www.kenyalaw.org/lex/actview.xql?actid=Const2010";
+const KENYA_LAW_BASE = "http://www.kenyalaw.org";
+const PARLIAMENT_BILLS = "https://www.parliament.go.ke/the-national-assembly/house-business/bills";
+
 const constitutionChapters = [
   { id: "1", chapter: "Chapter 1", title: "Sovereignty of the People and Supremacy of the Constitution", articles: "1-3" },
   { id: "2", chapter: "Chapter 2", title: "The Republic", articles: "4-11" },
@@ -30,19 +34,19 @@ const constitutionChapters = [
 ];
 
 const recentLaws = [
-  { id: "1", title: "Finance Act 2024", year: 2024, status: "enacted", description: "An Act of Parliament to amend the law relating to various taxes and duties" },
-  { id: "2", title: "Digital Health Act 2023", year: 2023, status: "enacted", description: "An Act to provide for the regulation of digital health services in Kenya" },
-  { id: "3", title: "Climate Change (Amendment) Act 2023", year: 2023, status: "enacted", description: "An Act to amend the Climate Change Act for enhanced environmental protection" },
-  { id: "4", title: "Data Protection (Amendment) Act 2023", year: 2023, status: "enacted", description: "An Act to strengthen data protection and privacy regulations" },
-  { id: "5", title: "Affordable Housing Act 2024", year: 2024, status: "enacted", description: "An Act to provide for affordable housing development and financing" },
-  { id: "6", title: "Public Finance Management (Amendment) Act 2024", year: 2024, status: "enacted", description: "An Act to improve public finance management and accountability" },
+  { id: "1", title: "Finance Act 2024", year: 2024, status: "enacted", description: "An Act of Parliament to amend the law relating to various taxes and duties", url: "http://www.kenyalaw.org/kl/index.php?id=12089" },
+  { id: "2", title: "Digital Health Act 2023", year: 2023, status: "enacted", description: "An Act to provide for the regulation of digital health services in Kenya", url: "http://www.kenyalaw.org/kl/index.php?id=11987" },
+  { id: "3", title: "Climate Change (Amendment) Act 2023", year: 2023, status: "enacted", description: "An Act to amend the Climate Change Act for enhanced environmental protection", url: "http://www.kenyalaw.org/kl/index.php?id=11945" },
+  { id: "4", title: "Data Protection (Amendment) Act 2023", year: 2023, status: "enacted", description: "An Act to strengthen data protection and privacy regulations", url: "http://www.kenyalaw.org/kl/index.php?id=11960" },
+  { id: "5", title: "Affordable Housing Act 2024", year: 2024, status: "enacted", description: "An Act to provide for affordable housing development and financing", url: "http://www.kenyalaw.org/kl/index.php?id=12100" },
+  { id: "6", title: "Public Finance Management (Amendment) Act 2024", year: 2024, status: "enacted", description: "An Act to improve public finance management and accountability", url: "http://www.kenyalaw.org/kl/index.php?id=12110" },
 ];
 
 const pendingBills = [
-  { id: "1", title: "Social Health Insurance Bill 2024", sponsor: "Ministry of Health", stage: "Second Reading", description: "A Bill to establish a universal health coverage framework" },
-  { id: "2", title: "National Youth Service (Amendment) Bill 2024", sponsor: "Ministry of Youth", stage: "Committee Stage", description: "A Bill to enhance youth employment programs" },
-  { id: "3", title: "County Revenue Bill 2024", sponsor: "Senate", stage: "First Reading", description: "A Bill to revise county revenue allocation formula" },
-  { id: "4", title: "Digital Economy Bill 2024", sponsor: "ICT Committee", stage: "Public Participation", description: "A Bill to regulate digital economy and e-commerce" },
+  { id: "1", title: "Social Health Insurance Bill 2024", sponsor: "Ministry of Health", stage: "Second Reading", description: "A Bill to establish a universal health coverage framework", url: PARLIAMENT_BILLS },
+  { id: "2", title: "National Youth Service (Amendment) Bill 2024", sponsor: "Ministry of Youth", stage: "Committee Stage", description: "A Bill to enhance youth employment programs", url: PARLIAMENT_BILLS },
+  { id: "3", title: "County Revenue Bill 2024", sponsor: "Senate", stage: "First Reading", description: "A Bill to revise county revenue allocation formula", url: PARLIAMENT_BILLS },
+  { id: "4", title: "Digital Economy Bill 2024", sponsor: "ICT Committee", stage: "Public Participation", description: "A Bill to regulate digital economy and e-commerce", url: PARLIAMENT_BILLS },
 ];
 
 const importantDocuments = [
@@ -157,6 +161,15 @@ export default function CivicFacts() {
                         <span className="text-xs text-muted-foreground">Articles {chapter.articles}</span>
                       </div>
                       <h3 className="font-medium">{chapter.title}</h3>
+                      <a
+                        href={KENYA_LAW_CONSTITUTION}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 text-xs text-primary hover:underline mt-1"
+                      >
+                        <ExternalLink className="h-3 w-3" />
+                        Read on Kenya Law
+                      </a>
                     </div>
                   </div>
                 </CardContent>
@@ -186,6 +199,15 @@ export default function CivicFacts() {
                 </CardHeader>
                 <CardContent>
                   <p className="text-muted-foreground">{law.description}</p>
+                  <a
+                    href={law.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 text-xs text-primary hover:underline mt-2"
+                  >
+                    <ExternalLink className="h-3 w-3" />
+                    View on Kenya Law
+                  </a>
                 </CardContent>
               </Card>
             ))}
@@ -213,6 +235,15 @@ export default function CivicFacts() {
                 </CardHeader>
                 <CardContent>
                   <p className="text-muted-foreground">{bill.description}</p>
+                  <a
+                    href={bill.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 text-xs text-primary hover:underline mt-2"
+                  >
+                    <ExternalLink className="h-3 w-3" />
+                    Track on Parliament.go.ke
+                  </a>
                 </CardContent>
               </Card>
             ))}
