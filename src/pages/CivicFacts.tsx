@@ -161,6 +161,15 @@ export default function CivicFacts() {
                         <span className="text-xs text-muted-foreground">Articles {chapter.articles}</span>
                       </div>
                       <h3 className="font-medium">{chapter.title}</h3>
+                      <a
+                        href={KENYA_LAW_CONSTITUTION}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 text-xs text-primary hover:underline mt-1"
+                      >
+                        <ExternalLink className="h-3 w-3" />
+                        Read on Kenya Law
+                      </a>
                     </div>
                   </div>
                 </CardContent>
