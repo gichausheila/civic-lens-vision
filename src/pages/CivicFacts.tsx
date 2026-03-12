@@ -43,10 +43,10 @@ const recentLaws = [
 ];
 
 const pendingBills = [
-  { id: "1", title: "Social Health Insurance Bill 2024", sponsor: "Ministry of Health", stage: "Second Reading", description: "A Bill to establish a universal health coverage framework" },
-  { id: "2", title: "National Youth Service (Amendment) Bill 2024", sponsor: "Ministry of Youth", stage: "Committee Stage", description: "A Bill to enhance youth employment programs" },
-  { id: "3", title: "County Revenue Bill 2024", sponsor: "Senate", stage: "First Reading", description: "A Bill to revise county revenue allocation formula" },
-  { id: "4", title: "Digital Economy Bill 2024", sponsor: "ICT Committee", stage: "Public Participation", description: "A Bill to regulate digital economy and e-commerce" },
+  { id: "1", title: "Social Health Insurance Bill 2024", sponsor: "Ministry of Health", stage: "Second Reading", description: "A Bill to establish a universal health coverage framework", url: PARLIAMENT_BILLS },
+  { id: "2", title: "National Youth Service (Amendment) Bill 2024", sponsor: "Ministry of Youth", stage: "Committee Stage", description: "A Bill to enhance youth employment programs", url: PARLIAMENT_BILLS },
+  { id: "3", title: "County Revenue Bill 2024", sponsor: "Senate", stage: "First Reading", description: "A Bill to revise county revenue allocation formula", url: PARLIAMENT_BILLS },
+  { id: "4", title: "Digital Economy Bill 2024", sponsor: "ICT Committee", stage: "Public Participation", description: "A Bill to regulate digital economy and e-commerce", url: PARLIAMENT_BILLS },
 ];
 
 const importantDocuments = [
