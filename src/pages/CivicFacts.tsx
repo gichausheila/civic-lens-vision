@@ -34,12 +34,12 @@ const constitutionChapters = [
 ];
 
 const recentLaws = [
-  { id: "1", title: "Finance Act 2024", year: 2024, status: "enacted", description: "An Act of Parliament to amend the law relating to various taxes and duties" },
-  { id: "2", title: "Digital Health Act 2023", year: 2023, status: "enacted", description: "An Act to provide for the regulation of digital health services in Kenya" },
-  { id: "3", title: "Climate Change (Amendment) Act 2023", year: 2023, status: "enacted", description: "An Act to amend the Climate Change Act for enhanced environmental protection" },
-  { id: "4", title: "Data Protection (Amendment) Act 2023", year: 2023, status: "enacted", description: "An Act to strengthen data protection and privacy regulations" },
-  { id: "5", title: "Affordable Housing Act 2024", year: 2024, status: "enacted", description: "An Act to provide for affordable housing development and financing" },
-  { id: "6", title: "Public Finance Management (Amendment) Act 2024", year: 2024, status: "enacted", description: "An Act to improve public finance management and accountability" },
+  { id: "1", title: "Finance Act 2024", year: 2024, status: "enacted", description: "An Act of Parliament to amend the law relating to various taxes and duties", url: "http://www.kenyalaw.org/kl/index.php?id=12089" },
+  { id: "2", title: "Digital Health Act 2023", year: 2023, status: "enacted", description: "An Act to provide for the regulation of digital health services in Kenya", url: "http://www.kenyalaw.org/kl/index.php?id=11987" },
+  { id: "3", title: "Climate Change (Amendment) Act 2023", year: 2023, status: "enacted", description: "An Act to amend the Climate Change Act for enhanced environmental protection", url: "http://www.kenyalaw.org/kl/index.php?id=11945" },
+  { id: "4", title: "Data Protection (Amendment) Act 2023", year: 2023, status: "enacted", description: "An Act to strengthen data protection and privacy regulations", url: "http://www.kenyalaw.org/kl/index.php?id=11960" },
+  { id: "5", title: "Affordable Housing Act 2024", year: 2024, status: "enacted", description: "An Act to provide for affordable housing development and financing", url: "http://www.kenyalaw.org/kl/index.php?id=12100" },
+  { id: "6", title: "Public Finance Management (Amendment) Act 2024", year: 2024, status: "enacted", description: "An Act to improve public finance management and accountability", url: "http://www.kenyalaw.org/kl/index.php?id=12110" },
 ];
 
 const pendingBills = [
