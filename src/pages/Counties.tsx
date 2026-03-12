@@ -64,6 +64,13 @@ const countyLandmarks: Record<number, { name: string; imageUrl: string; wikiUrl:
 // Fallback placeholder image
 const FALLBACK_IMAGE = "/placeholder.svg";
 
+// Official data sources
+const DATA_SOURCES = {
+  knbs: "https://www.knbs.or.ke/",
+  iebc: "https://www.iebc.or.ke/",
+  parliament: "https://www.parliament.go.ke/the-national-assembly/mps",
+} as const;
+
 const Counties = () => {
   const { data: counties, isLoading: loadingCounties } = useCounties();
   const { data: leaders } = useLeaders();
