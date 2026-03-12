@@ -11,6 +11,13 @@ import { ManifestoSection } from "@/components/leaders/ManifestoSection";
 import { ParliamentaryActivity } from "@/components/leaders/ParliamentaryActivity";
 import { Clock } from "lucide-react";
 
+// Official source URLs
+const OFFICIAL_SOURCES = {
+  parliament: "https://www.parliament.go.ke/the-national-assembly/mps",
+  iebc: "https://www.iebc.or.ke/",
+  kenyaLaw: "http://www.kenyalaw.org",
+} as const;
+
 // Placeholder legal information
 const placeholderLegalInfo = [
   { text: "No pending court cases as of record date", type: "clear" },
