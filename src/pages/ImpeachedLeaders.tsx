@@ -60,11 +60,42 @@ export default function ImpeachedLeaders() {
       </div>
 
       <div className="bg-muted/50 border border-border rounded-lg p-4 mb-8">
-        <p className="text-sm text-muted-foreground">
+        <p className="text-sm text-muted-foreground mb-3">
           <strong>Disclaimer:</strong> The information presented here is compiled from official government
           records, parliamentary proceedings, and verified news sources. It is intended for educational
           and informational purposes only.
         </p>
+        <div className="flex flex-wrap gap-2">
+          <p className="text-xs text-muted-foreground w-full mb-1">Official Sources:</p>
+          <Button variant="outline" size="sm" asChild>
+            <a href="http://www.parliament.go.ke/the-senate" target="_blank" rel="noopener noreferrer">
+              <FileText className="h-3 w-3 mr-1" />
+              Senate of Kenya
+              <ExternalLink className="h-3 w-3 ml-1" />
+            </a>
+          </Button>
+          <Button variant="outline" size="sm" asChild>
+            <a href="http://kenyalaw.org" target="_blank" rel="noopener noreferrer">
+              <Gavel className="h-3 w-3 mr-1" />
+              Kenya Law Reports
+              <ExternalLink className="h-3 w-3 ml-1" />
+            </a>
+          </Button>
+          <Button variant="outline" size="sm" asChild>
+            <a href="https://judiciary.go.ke" target="_blank" rel="noopener noreferrer">
+              <Scale className="h-3 w-3 mr-1" />
+              Judiciary of Kenya
+              <ExternalLink className="h-3 w-3 ml-1" />
+            </a>
+          </Button>
+          <Button variant="outline" size="sm" asChild>
+            <a href="https://www.iebc.or.ke/" target="_blank" rel="noopener noreferrer">
+              <FileText className="h-3 w-3 mr-1" />
+              IEBC
+              <ExternalLink className="h-3 w-3 ml-1" />
+            </a>
+          </Button>
+        </div>
       </div>
 
       {isLoading ? (
